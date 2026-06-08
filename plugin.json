@@ -1,8 +1,8 @@
 {
   "$schema": "http://localhost:33299/plugin.schema.json",
-  "name": "当前应用",
+  "name": "Template Plugin",
   "version": "1.0.0",
-  "description": "显示当前设备正在运行的应用，支持复制包名、Activity、PID，以及杀掉和启动应用",
-  "homepage": "https://github.com/codeskyblue/uiautodev-plugin-app-current",
+  "description": "A uiautodev plugin template with Preact and Tailwind CSS",
+  "homepage": "",
   "main": "index.html"
 }

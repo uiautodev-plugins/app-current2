@@ -126,7 +126,7 @@
       h3,
       p3,
       v3,
-      y3,
+      y2,
       _2,
       g2,
       m3 = (t3 && t3.__k) || w,
@@ -140,14 +140,14 @@
         p3.ref &&
           h3.ref != p3.ref &&
           (h3.ref && J(h3.ref, null, p3), a3.push(p3.ref, p3.__c || v3, p3)),
-        null == y3 && null != v3 && (y3 = v3),
+        null == y2 && null != v3 && (y2 = v3),
         (g2 = !!(4 & p3.__u)) || h3.__k === p3.__k
           ? ((f4 = j(p3, f4, n2, g2)), g2 && h3.__e && (h3.__e = null))
           : 'function' == typeof p3.type && void 0 !== _2
             ? (f4 = _2)
             : v3 && (f4 = v3.nextSibling),
         (p3.__u &= -7));
-    return ((u4.__e = y3), f4);
+    return ((u4.__e = y2), f4);
   }
   function T(n2, l3, u4, t3, i3) {
     var r3,
@@ -289,7 +289,7 @@
       h3,
       p3,
       v3,
-      y3,
+      y2,
       d3,
       _2,
       k3,
@@ -328,7 +328,7 @@
             (h3.__s == h3.state && (h3.__s = m({}, h3.__s)),
             m(h3.__s, T3.getDerivedStateFromProps(k3, h3.__s))),
           (v3 = h3.props),
-          (y3 = h3.state),
+          (y2 = h3.state),
           (h3.__v = u4),
           p3)
         )
@@ -364,7 +364,7 @@
             x2 &&
               null != h3.componentDidUpdate &&
               h3.__h.push(function () {
-                h3.componentDidUpdate(v3, y3, d3);
+                h3.componentDidUpdate(v3, y2, d3);
               }));
         }
         if (
@@ -394,7 +394,7 @@
           x2 &&
             !p3 &&
             null != h3.getSnapshotBeforeUpdate &&
-            (d3 = h3.getSnapshotBeforeUpdate(v3, y3)),
+            (d3 = h3.getSnapshotBeforeUpdate(v3, y2)),
           (A2 = null != s3 && s3.type === S && null == s3.key ? E(s3.props.children) : s3),
           (f4 = L(n2, g(A2) ? A2 : [A2], u4, t3, i3, r3, o3, e3, f4, c3, a3)),
           (h3.base = u4.__e),
@@ -452,7 +452,7 @@
       h3,
       p3,
       v3,
-      y3,
+      y2,
       w3,
       _2,
       m3 = i3.props || d,
@@ -468,11 +468,11 @@
     ) {
       for (s3 = 0; s3 < e3.length; s3++)
         if (
-          (y3 = e3[s3]) &&
-          'setAttribute' in y3 == !!x2 &&
-          (x2 ? y3.localName == x2 : 3 == y3.nodeType)
+          (y2 = e3[s3]) &&
+          'setAttribute' in y2 == !!x2 &&
+          (x2 ? y2.localName == x2 : 3 == y2.nodeType)
         ) {
-          ((u4 = y3), (e3[s3] = null));
+          ((u4 = y2), (e3[s3] = null));
           break;
         }
     }
@@ -489,27 +489,27 @@
         !c3 && null != e3)
       )
         for (m3 = {}, s3 = 0; s3 < u4.attributes.length; s3++)
-          m3[(y3 = u4.attributes[s3]).name] = y3.value;
+          m3[(y2 = u4.attributes[s3]).name] = y2.value;
       for (s3 in m3)
-        ((y3 = m3[s3]),
+        ((y2 = m3[s3]),
           'dangerouslySetInnerHTML' == s3
-            ? (p3 = y3)
+            ? (p3 = y2)
             : 'children' == s3 ||
               s3 in k3 ||
               ('value' == s3 && 'defaultValue' in k3) ||
               ('checked' == s3 && 'defaultChecked' in k3) ||
-              N(u4, s3, null, y3, o3));
+              N(u4, s3, null, y2, o3));
       for (s3 in k3)
-        ((y3 = k3[s3]),
+        ((y2 = k3[s3]),
           'children' == s3
-            ? (v3 = y3)
+            ? (v3 = y2)
             : 'dangerouslySetInnerHTML' == s3
-              ? (h3 = y3)
+              ? (h3 = y2)
               : 'value' == s3
-                ? (w3 = y3)
+                ? (w3 = y2)
                 : 'checked' == s3
-                  ? (_2 = y3)
-                  : (c3 && 'function' != typeof y3) || m3[s3] === y3 || N(u4, s3, y3, m3[s3], o3));
+                  ? (_2 = y2)
+                  : (c3 && 'function' != typeof y2) || m3[s3] === y2 || N(u4, s3, y2, m3[s3], o3));
       if (h3)
         (c3 ||
           (p3 && (h3.__html == p3.__html || h3.__html == u4.innerHTML)) ||
@@ -725,10 +725,6 @@
     }
     return o3.__N || o3.__;
   }
-  function y2(n2, u4) {
-    var i3 = p2(t2++, 3);
-    !c2.__s && C2(i3.__H, u4) && ((i3.__ = n2), (i3.u = u4), r2.__H.__h.push(i3));
-  }
   function T2(n2, r3) {
     var u4 = p2(t2++, 7);
     return (C2(u4.__H, r3) && ((u4.__ = n2()), (u4.__H = r3), (u4.__h = n2)), u4.__);
@@ -883,306 +879,32 @@
     const result = await $u.shell(cmd);
     return result.output.trim();
   }
-  function parseCurrentFocus(output) {
-    const match = output.match(/([a-zA-Z][\w.]*\/[.\w]+)/);
-    if (!match) return null;
-    const fullActivity = match[1];
-    const slashIndex = fullActivity.indexOf('/');
-    if (slashIndex <= 0) return null;
-    const pkg = fullActivity.substring(0, slashIndex);
-    const act = fullActivity.substring(slashIndex + 1);
-    const activity = act.startsWith('.') ? pkg + act : act;
-    return { pkg, activity };
-  }
-  function CopyIcon() {
-    return /* @__PURE__ */ u3('svg', {
-      width: '14',
-      height: '14',
-      viewBox: '0 0 24 24',
-      fill: 'none',
-      stroke: 'currentColor',
-      'stroke-width': '2',
-      'stroke-linecap': 'round',
-      'stroke-linejoin': 'round',
-      children: [
-        /* @__PURE__ */ u3('rect', { x: '9', y: '9', width: '13', height: '13', rx: '2', ry: '2' }),
-        /* @__PURE__ */ u3('path', {
-          d: 'M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1',
-        }),
-      ],
-    });
-  }
-  function CheckIcon() {
-    return /* @__PURE__ */ u3('svg', {
-      width: '14',
-      height: '14',
-      viewBox: '0 0 24 24',
-      fill: 'none',
-      stroke: 'currentColor',
-      'stroke-width': '2',
-      'stroke-linecap': 'round',
-      'stroke-linejoin': 'round',
-      children: /* @__PURE__ */ u3('polyline', { points: '20 6 9 17 4 12' }),
-    });
-  }
-  function RefreshIcon({ class: cls }) {
-    return /* @__PURE__ */ u3('svg', {
-      class: cls,
-      width: '14',
-      height: '14',
-      viewBox: '0 0 24 24',
-      fill: 'none',
-      stroke: 'currentColor',
-      'stroke-width': '2',
-      'stroke-linecap': 'round',
-      'stroke-linejoin': 'round',
-      children: [
-        /* @__PURE__ */ u3('path', { d: 'M21 2v6h-6' }),
-        /* @__PURE__ */ u3('path', { d: 'M3 12a9 9 0 0 1 15-6.7L21 8' }),
-        /* @__PURE__ */ u3('path', { d: 'M3 22v-6h6' }),
-        /* @__PURE__ */ u3('path', { d: 'M21 12a9 9 0 0 1-15 6.7L3 16' }),
-      ],
-    });
-  }
-  function Card({ children }) {
-    return /* @__PURE__ */ u3('div', { children });
-  }
-  function CardContent({ children, class: cls }) {
-    return /* @__PURE__ */ u3('div', { class: `py-1 ${cls ?? ''}`, children });
-  }
-  function Separator() {
-    return /* @__PURE__ */ u3('div', { class: 'h-px bg-slate-100 mx-2' });
-  }
-  function Button({ children, variant, size, onClick, disabled }) {
-    const base =
-      'inline-flex items-center justify-center gap-1 rounded-md text-xs font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-slate-400 disabled:pointer-events-none disabled:opacity-50 cursor-pointer';
-    const variants = {
-      ghost: 'hover:bg-slate-50 text-slate-600',
-      outline: 'border border-slate-200 bg-white hover:bg-slate-50 text-slate-700',
-      destructive: 'border border-red-200 bg-white text-red-600 hover:bg-red-50',
-      default: 'bg-slate-900 text-white hover:bg-slate-800',
-    };
-    const sizes = {
-      sm: 'h-7 px-2.5',
-      icon: 'h-7 w-7',
-    };
+  function Button({ children, onClick, disabled }) {
     return /* @__PURE__ */ u3('button', {
-      class: `${base} ${variants[variant ?? 'default']} ${sizes[size ?? 'sm']}`,
+      class:
+        'inline-flex items-center justify-center gap-1 rounded-md bg-slate-900 px-3 py-1.5 text-xs font-medium text-white hover:bg-slate-800 disabled:pointer-events-none disabled:opacity-50 cursor-pointer',
       onClick,
       disabled,
       children,
     });
   }
-  function InfoRow({ label, value, onCopy, copied }) {
-    return /* @__PURE__ */ u3('div', {
-      class: 'py-0.5 first:pt-0 last:pb-0',
-      children: [
-        /* @__PURE__ */ u3('div', {
-          class: 'flex items-center gap-1.5 mb-0',
-          children: /* @__PURE__ */ u3('span', {
-            class: 'text-[11px] text-slate-400',
-            children: label,
-          }),
-        }),
-        /* @__PURE__ */ u3('div', {
-          class: 'flex items-center gap-1',
-          children: [
-            /* @__PURE__ */ u3('span', {
-              class: 'text-xs font-mono text-slate-700 break-all flex-1 min-w-0',
-              children: value,
-            }),
-            /* @__PURE__ */ u3(Button, {
-              variant: 'ghost',
-              size: 'icon',
-              onClick: onCopy,
-              children: copied
-                ? /* @__PURE__ */ u3(CheckIcon, {})
-                : /* @__PURE__ */ u3(CopyIcon, {}),
-            }),
-          ],
-        }),
-      ],
-    });
-  }
   function App() {
-    const [packageName, setPackageName] = d2('');
-    const [activity, setActivity] = d2('');
-    const [pid, setPid] = d2('');
     const [loading, setLoading] = d2(false);
-    const [message, setMessage] = d2('');
-    const [copiedField, setCopiedField] = d2('');
-    const refresh = q2(async () => {
-      console.log('refresh');
+    const goHome = q2(async () => {
       setLoading(true);
-      setMessage('');
       try {
-        const output = await shell(
-          "dumpsys window windows | grep -E 'mCurrentFocus|mFocusedApp' || dumpsys activity activities | grep -E 'mResumedActivity|ResumedActivity'",
-        );
-        const parsed = parseCurrentFocus(output);
-        if (parsed) {
-          setPackageName(parsed.pkg);
-          setActivity(parsed.activity);
-          const pidOutput = await shell(`pidof ${parsed.pkg}`);
-          setPid(pidOutput || 'N/A');
-        }
-      } catch (e3) {
-        setMessage('\u83B7\u53D6\u5931\u8D25: ' + (e3.message || e3));
+        await shell('input keyevent HOME');
       } finally {
         setLoading(false);
       }
     }, []);
-    y2(() => {
-      refresh();
-    }, [refresh]);
-    const copyText = q2(async (text, label) => {
-      try {
-        const ta = document.createElement('textarea');
-        ta.value = text;
-        ta.style.position = 'fixed';
-        ta.style.opacity = '0';
-        document.body.appendChild(ta);
-        ta.select();
-        document.execCommand('copy');
-        document.body.removeChild(ta);
-        setCopiedField(label);
-        setMessage(`${label}\u5DF2\u590D\u5236`);
-        setTimeout(() => {
-          setMessage('');
-          setCopiedField('');
-        }, 1500);
-      } catch {
-        setMessage('\u590D\u5236\u5931\u8D25');
-      }
-    }, []);
-    const killApp = q2(async () => {
-      if (!packageName) return;
-      setLoading(true);
-      try {
-        await shell(`am force-stop ${packageName}`);
-        setMessage('\u5DF2\u505C\u6B62');
-        setTimeout(() => setMessage(''), 1500);
-      } catch (e3) {
-        setMessage('\u505C\u6B62\u5931\u8D25: ' + (e3.message || e3));
-      } finally {
-        setLoading(false);
-      }
-    }, [packageName, refresh]);
-    const startApp = q2(async () => {
-      if (!activity) return;
-      setLoading(true);
-      try {
-        await shell(`am start ${activity.includes('/') ? activity : packageName + '/' + activity}`);
-        setMessage('\u5DF2\u542F\u52A8');
-        const pidOutput = await shell(`pidof ${packageName}`);
-        setPid(pidOutput || 'N/A');
-        setTimeout(() => setMessage(''), 1500);
-      } catch (e3) {
-        setMessage('\u542F\u52A8\u5931\u8D25: ' + (e3.message || e3));
-      } finally {
-        setLoading(false);
-      }
-    }, [activity, packageName, refresh]);
-    return /* @__PURE__ */ u3(S, {
-      children: [
-        packageName
-          ? /* @__PURE__ */ u3(S, {
-              children: [
-                /* @__PURE__ */ u3(Card, {
-                  children: [
-                    /* @__PURE__ */ u3(CardContent, {
-                      children: /* @__PURE__ */ u3(InfoRow, {
-                        label: 'Package',
-                        value: packageName,
-                        onCopy: () => copyText(packageName, '\u5305\u540D'),
-                        copied: copiedField === '\u5305\u540D',
-                      }),
-                    }),
-                    /* @__PURE__ */ u3(Separator, {}),
-                    /* @__PURE__ */ u3(CardContent, {
-                      children: /* @__PURE__ */ u3(InfoRow, {
-                        label: 'Activity',
-                        value: activity,
-                        onCopy: () => copyText(activity, 'Activity'),
-                        copied: copiedField === 'Activity',
-                      }),
-                    }),
-                    /* @__PURE__ */ u3(Separator, {}),
-                    /* @__PURE__ */ u3(CardContent, {
-                      children: /* @__PURE__ */ u3(InfoRow, {
-                        label: 'PID',
-                        value: pid,
-                        onCopy: () => copyText(pid, 'PID'),
-                        copied: copiedField === 'PID',
-                      }),
-                    }),
-                  ],
-                }),
-                /* @__PURE__ */ u3('div', {
-                  class: 'flex gap-2 mt-1',
-                  children: [
-                    /* @__PURE__ */ u3(Button, {
-                      variant: 'outline',
-                      onClick: refresh,
-                      disabled: loading,
-                      children: [
-                        /* @__PURE__ */ u3(RefreshIcon, { class: loading ? 'animate-spin' : '' }),
-                        loading ? '\u5237\u65B0\u4E2D...' : '\u5237\u65B0',
-                      ],
-                    }),
-                    /* @__PURE__ */ u3('div', { class: 'flex-1' }),
-                    /* @__PURE__ */ u3(Button, {
-                      variant: 'destructive',
-                      onClick: killApp,
-                      disabled: loading,
-                      children: '\u5F3A\u5236\u505C\u6B62',
-                    }),
-                    /* @__PURE__ */ u3(Button, {
-                      variant: 'default',
-                      onClick: startApp,
-                      disabled: loading,
-                      children: '\u542F\u52A8\u5E94\u7528',
-                    }),
-                  ],
-                }),
-              ],
-            })
-          : !loading
-            ? /* @__PURE__ */ u3('div', {
-                class: 'text-center py-5 text-slate-300',
-                children: [
-                  /* @__PURE__ */ u3('svg', {
-                    class: 'mx-auto mb-2 text-slate-200',
-                    width: '32',
-                    height: '32',
-                    viewBox: '0 0 24 24',
-                    fill: 'none',
-                    stroke: 'currentColor',
-                    'stroke-width': '1.5',
-                    children: [
-                      /* @__PURE__ */ u3('rect', {
-                        x: '2',
-                        y: '3',
-                        width: '20',
-                        height: '14',
-                        rx: '2',
-                      }),
-                      /* @__PURE__ */ u3('path', { d: 'M8 21h8M12 17v4' }),
-                    ],
-                  }),
-                  /* @__PURE__ */ u3('p', {
-                    class: 'text-xs',
-                    children: '\u672A\u68C0\u6D4B\u5230\u8FD0\u884C\u4E2D\u7684\u5E94\u7528',
-                  }),
-                ],
-              })
-            : null,
-        message &&
-          /* @__PURE__ */ u3('div', {
-            class: `text-center text-xs mt-2 min-h-[18px] ${message.includes('\u5931\u8D25') ? 'text-red-500' : 'text-emerald-600'}`,
-            children: message,
-          }),
-      ],
+    return /* @__PURE__ */ u3('div', {
+      class: 'p-2',
+      children: /* @__PURE__ */ u3(Button, {
+        onClick: goHome,
+        disabled: loading,
+        children: loading ? 'Going...' : 'Home',
+      }),
     });
   }
   R(/* @__PURE__ */ u3(App, {}), document.getElementById('app'));
