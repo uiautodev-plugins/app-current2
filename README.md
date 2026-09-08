@@ -7,8 +7,8 @@
 ### 1. 克隆模板
 
 ```bash
-git clone https://github.com/uiautodev-plugins/preact-template ~/.uiautodev/plugins/my-plugin
-cd ~/.uiautodev/plugins/my-plugin
+git clone https://github.com/uiautodev-plugins/preact-template ~/.config/uiautodev/plugins/my-plugin
+cd !$
 ```
 
 ### 2. 安装依赖
