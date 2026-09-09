@@ -168,6 +168,7 @@ function App() {
   const [autoRefresh, setAutoRefresh] = useState(true);
   const [copied, setCopied] = useState('');
   const pollingRef = useRef(false);
+  const lastPkgRef = useRef('');
 
   const loadAppInfo = useCallback(async (p: string) => {
     const [items, ver] = await Promise.all([listLauncherActivities(p), getAppVersion(p)]);
@@ -177,6 +178,7 @@ function App() {
 
   const pollOnce = useCallback(async (): Promise<string> => {
     const { pkg: p, activity: a } = await getCurrentApp();
+    lastPkgRef.current = p;
     setPkg(p);
     setActivity(a);
     if (p) {
@@ -212,6 +214,8 @@ function App() {
       try {
         const { pkg: p, activity: a } = await getCurrentApp();
         if (cancelled) return;
+        if (p === lastPkgRef.current) return;
+        lastPkgRef.current = p;
         setPkg(p);
         setActivity(a);
         if (p) {

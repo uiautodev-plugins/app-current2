@@ -896,6 +896,7 @@
     const [autoRefresh, setAutoRefresh] = d2(true);
     const [copied, setCopied] = d2("");
     const pollingRef = A2(false);
+    const lastPkgRef = A2("");
     const loadAppInfo = q2(async (p3) => {
       const [items, ver] = await Promise.all([listLauncherActivities(p3), getAppVersion(p3)]);
       setLaunchItems(items);
@@ -903,6 +904,7 @@
     }, []);
     const pollOnce = q2(async () => {
       const { pkg: p3, activity: a3 } = await getCurrentApp();
+      lastPkgRef.current = p3;
       setPkg(p3);
       setActivity(a3);
       if (p3) {
@@ -935,6 +937,8 @@
         try {
           const { pkg: p3, activity: a3 } = await getCurrentApp();
           if (cancelled) return;
+          if (p3 === lastPkgRef.current) return;
+          lastPkgRef.current = p3;
           setPkg(p3);
           setActivity(a3);
           if (p3) {
