@@ -1,7 +1,7 @@
 /// <reference path="./plugin-runtime.d.ts" />
 import { render } from 'preact';
 import { useState, useCallback, useEffect, useRef } from 'preact/hooks';
-import { Trash2, Square, RefreshCw, Copy, Check } from 'lucide-preact';
+import { Trash2, Square, RefreshCw, Copy, Check, Eraser } from 'lucide-preact';
 
 async function shell(cmd: string): Promise<string> {
   const result = await $u.shell(cmd);
@@ -52,23 +52,37 @@ async function uninstallApp(pkg: string): Promise<string> {
     : `卸载失败: ${msg}`;
 }
 
+async function clearDataApp(pkg: string): Promise<string> {
+  const out = await shell(`pm clear ${pkg}`);
+  const msg = out || '(无输出)';
+  return msg.toLowerCase().includes('success') || msg.includes('Success')
+    ? ''
+    : `清空失败: ${msg}`;
+}
+
 function Button({
   children,
   onClick,
   disabled,
   danger,
+  armed,
   ariaLabel,
 }: {
   children: preact.ComponentChildren;
   onClick?: () => void;
   disabled?: boolean;
   danger?: boolean;
+  armed?: boolean;
   ariaLabel?: string;
 }) {
   return (
     <button
       class={`inline-flex cursor-pointer items-center justify-center gap-1 rounded-md px-3 py-1.5 text-xs font-medium text-white disabled:pointer-events-none disabled:opacity-40 ${
-        danger ? 'bg-red-600 hover:bg-red-500' : 'bg-slate-900 hover:bg-slate-700'
+        danger
+          ? 'bg-red-600 hover:bg-red-500'
+          : armed
+            ? 'bg-amber-500 hover:bg-amber-400'
+            : 'bg-slate-900 hover:bg-slate-700 dark:bg-slate-700 dark:hover:bg-slate-600'
       }`}
       onClick={onClick}
       disabled={disabled}
@@ -91,7 +105,7 @@ function CopyButton({
   return (
     <button
       aria-label="复制"
-      class="inline-flex shrink-0 cursor-pointer items-center rounded p-1 text-slate-400 hover:bg-slate-200 hover:text-slate-600"
+      class="inline-flex shrink-0 cursor-pointer items-center rounded p-1 text-slate-400 hover:bg-slate-200 hover:text-slate-600 dark:hover:bg-slate-700 dark:hover:text-slate-300"
       onClick={(e) => {
         e.stopPropagation();
         onCopy(text);
@@ -108,6 +122,7 @@ function App() {
   const [busy, setBusy] = useState(false);
   const [status, setStatus] = useState('');
   const [confirmUninstall, setConfirmUninstall] = useState(false);
+  const [confirmClear, setConfirmClear] = useState(false);
   const [launchItems, setLaunchItems] = useState<string[]>([]);
   const [autoRefresh, setAutoRefresh] = useState(true);
   const [copied, setCopied] = useState('');
@@ -181,6 +196,12 @@ function App() {
     };
   }, [autoRefresh]);
 
+  useEffect(() => {
+    if (!confirmClear) return;
+    const t = window.setTimeout(() => setConfirmClear(false), 4000);
+    return () => window.clearTimeout(t);
+  }, [confirmClear]);
+
   const run = useCallback(
     async (fn: (p: string) => Promise<string>) => {
       if (!pkg) return;
@@ -193,6 +214,7 @@ function App() {
       } finally {
         setBusy(false);
         setConfirmUninstall(false);
+        setConfirmClear(false);
       }
     },
     [pkg],
@@ -237,13 +259,14 @@ function App() {
 
   const handleStop = useCallback(() => {
     setConfirmUninstall(false);
+    setConfirmClear(false);
     setAutoRefresh(false);
   }, []);
 
   return (
     <div>
       <div class="flex items-center gap-1">
-        <div class="min-w-0 flex-1 break-all rounded-md bg-slate-50 px-3 py-2 font-mono text-sm text-slate-800">
+        <div class="min-w-0 flex-1 break-all rounded-md bg-slate-50 px-3 py-2 font-mono text-sm text-slate-800 dark:bg-slate-800 dark:text-slate-100">
           {pkg || '未检测到前台应用'}
         </div>
         {pkg && <CopyButton text={pkg} copied={copied === pkg} onCopy={copyText} />}
@@ -251,15 +274,16 @@ function App() {
 
       {launchItems.length > 0 && (
         <div class="mt-3">
-          <div class="mb-1 text-xs font-medium text-slate-500">
-            启动入口<span class="ml-1 font-normal text-slate-400">点击即可启动</span>
+          <div class="mb-1 text-xs font-medium text-slate-500 dark:text-slate-400">
+            启动入口
+            <span class="ml-1 font-normal text-slate-400 dark:text-slate-500">点击即可启动</span>
           </div>
           <ul class="space-y-1">
             {launchItems.map((component) => (
               <li key={component}>
                 <div class="flex items-center gap-1">
                   <button
-                    class="min-w-0 flex-1 cursor-pointer rounded-md bg-slate-50 px-3 py-2 text-left text-xs text-slate-700 hover:bg-slate-100 disabled:opacity-50"
+                    class="min-w-0 flex-1 cursor-pointer rounded-md bg-slate-50 px-3 py-2 text-left text-xs text-slate-700 hover:bg-slate-100 disabled:opacity-50 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700"
                     title={component}
                     onClick={() => {
                       handleStop();
@@ -279,9 +303,9 @@ function App() {
 
       {version && (
         <div class="mt-3">
-          <div class="mb-1 text-xs font-medium text-slate-500">版本号</div>
+          <div class="mb-1 text-xs font-medium text-slate-500 dark:text-slate-400">版本号</div>
           <div class="flex items-center gap-1">
-            <div class="min-w-0 flex-1 break-all rounded-md bg-slate-50 px-3 py-2 font-mono text-xs text-slate-700">
+            <div class="min-w-0 flex-1 break-all rounded-md bg-slate-50 px-3 py-2 font-mono text-xs text-slate-700 dark:bg-slate-800 dark:text-slate-200">
               {version.name} ({version.code})
             </div>
             <CopyButton
@@ -296,6 +320,16 @@ function App() {
       <div class="mt-4 mb-2 flex items-center justify-between">
         <div class="flex gap-2">
           <Button
+            ariaLabel="强制停止应用"
+            onClick={() => {
+              handleStop();
+              run(stopApp);
+            }}
+            disabled={busy || noPkg}
+          >
+            <Square class="h-4 w-4 fill-current" />
+          </Button>
+          <Button
             ariaLabel="卸载应用"
             danger
             onClick={() => {
@@ -307,14 +341,22 @@ function App() {
             <Trash2 class="h-4 w-4" />
           </Button>
           <Button
-            ariaLabel="强制停止应用"
+            ariaLabel="清空应用数据"
+            armed={confirmClear}
             onClick={() => {
-              handleStop();
-              run(stopApp);
+              setConfirmUninstall(false);
+              setAutoRefresh(false);
+              if (confirmClear) {
+                setConfirmClear(false);
+                run(clearDataApp);
+              } else {
+                setConfirmClear(true);
+              }
             }}
             disabled={busy || noPkg}
           >
-            <Square class="h-4 w-4 fill-current" />
+            <Eraser class="h-4 w-4" />
+            {confirmClear && '确认?'}
           </Button>
         </div>
         <button
@@ -322,7 +364,7 @@ function App() {
           class={`inline-flex cursor-pointer items-center rounded-md px-2 py-1.5 disabled:opacity-50 ${
             autoRefresh
               ? 'bg-indigo-600 text-white hover:bg-indigo-500'
-              : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+              : 'bg-slate-100 text-slate-700 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700'
           }`}
           onClick={() => {
             if (autoRefresh) {
@@ -342,8 +384,8 @@ function App() {
       </div>
 
       {confirmUninstall && (
-        <div class="rounded-md border border-red-200 bg-red-50 p-2">
-          <p class="mb-2 text-xs text-red-700">
+        <div class="rounded-md border border-red-200 bg-red-50 p-2 dark:border-red-900 dark:bg-red-950">
+          <p class="mb-2 text-xs text-red-700 dark:text-red-300">
             确认卸载 <span class="font-mono font-semibold">{pkg}</span> 吗？
           </p>
           <div class="flex gap-2">
@@ -365,7 +407,7 @@ function App() {
       )}
 
       {status && (
-        <div class="mt-3 break-all rounded-md bg-slate-100 p-2 text-xs text-slate-600">
+        <div class="mt-3 break-all rounded-md bg-slate-100 p-2 text-xs text-slate-600 dark:bg-slate-800 dark:text-slate-300">
           {status}
         </div>
       )}

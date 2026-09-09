@@ -615,18 +615,18 @@
 
   // node_modules/lucide-preact/dist/esm/createLucideIcon.mjs
   function createLucideIcon(iconDataOrName, iconNode, aliases = []) {
-    const iconData6 = typeof iconDataOrName === "string" ? toLucideIconData(iconDataOrName, iconNode, aliases) : iconDataOrName;
+    const iconData7 = typeof iconDataOrName === "string" ? toLucideIconData(iconDataOrName, iconNode, aliases) : iconDataOrName;
     const Component = ({ class: classes = "", className = "", children, ...props }) => k(
       Icon,
       {
         ...props,
-        icon: iconData6,
+        icon: iconData7,
         class: mergeClasses(classes, className)
       },
       children
     );
-    if (iconData6.name) {
-      Component.displayName = toPascalCase(iconData6.name);
+    if (iconData7.name) {
+      Component.displayName = toPascalCase(iconData7.name);
     }
     return Component;
   }
@@ -650,8 +650,25 @@
   };
   var Copy = createLucideIcon(iconData2);
 
-  // node_modules/lucide-preact/dist/esm/icons/refresh-cw.mjs
+  // node_modules/lucide-preact/dist/esm/icons/eraser.mjs
   var iconData3 = {
+    name: "eraser",
+    size: 24,
+    node: [
+      [
+        "path",
+        {
+          d: "M21 21H8a2 2 0 0 1-1.42-.587l-3.994-3.999a2 2 0 0 1 0-2.828l10-10a2 2 0 0 1 2.829 0l5.999 6a2 2 0 0 1 0 2.828L12.834 21",
+          key: "g5wo59"
+        }
+      ],
+      ["path", { d: "m5.082 11.09 8.828 8.828", key: "1wx5vj" }]
+    ]
+  };
+  var Eraser = createLucideIcon(iconData3);
+
+  // node_modules/lucide-preact/dist/esm/icons/refresh-cw.mjs
+  var iconData4 = {
     name: "refresh-cw",
     size: 24,
     node: [
@@ -661,18 +678,18 @@
       ["path", { d: "M8 16H3v5", key: "1cv678" }]
     ]
   };
-  var RefreshCw = createLucideIcon(iconData3);
+  var RefreshCw = createLucideIcon(iconData4);
 
   // node_modules/lucide-preact/dist/esm/icons/square.mjs
-  var iconData4 = {
+  var iconData5 = {
     name: "square",
     size: 24,
     node: [["rect", { width: "18", height: "18", x: "3", y: "3", rx: "2", key: "afitv7" }]]
   };
-  var Square = createLucideIcon(iconData4);
+  var Square = createLucideIcon(iconData5);
 
   // node_modules/lucide-preact/dist/esm/icons/trash.mjs
-  var iconData5 = {
+  var iconData6 = {
     name: "trash",
     size: 24,
     node: [
@@ -684,7 +701,7 @@
     ],
     aliases: ["trash-2"]
   };
-  var Trash = createLucideIcon(iconData5);
+  var Trash = createLucideIcon(iconData6);
 
   // node_modules/preact/jsx-runtime/dist/jsxRuntime.module.js
   var f3 = 0;
@@ -734,17 +751,23 @@
     const msg = out || "(\u65E0\u8F93\u51FA)";
     return msg.toLowerCase().includes("success") || msg.includes("Success") ? `\u5378\u8F7D\u6210\u529F: ${pkg}` : `\u5378\u8F7D\u5931\u8D25: ${msg}`;
   }
+  async function clearDataApp(pkg) {
+    const out = await shell(`pm clear ${pkg}`);
+    const msg = out || "(\u65E0\u8F93\u51FA)";
+    return msg.toLowerCase().includes("success") || msg.includes("Success") ? "" : `\u6E05\u7A7A\u5931\u8D25: ${msg}`;
+  }
   function Button({
     children,
     onClick,
     disabled,
     danger,
+    armed,
     ariaLabel
   }) {
     return /* @__PURE__ */ u3(
       "button",
       {
-        class: `inline-flex cursor-pointer items-center justify-center gap-1 rounded-md px-3 py-1.5 text-xs font-medium text-white disabled:pointer-events-none disabled:opacity-40 ${danger ? "bg-red-600 hover:bg-red-500" : "bg-slate-900 hover:bg-slate-700"}`,
+        class: `inline-flex cursor-pointer items-center justify-center gap-1 rounded-md px-3 py-1.5 text-xs font-medium text-white disabled:pointer-events-none disabled:opacity-40 ${danger ? "bg-red-600 hover:bg-red-500" : armed ? "bg-amber-500 hover:bg-amber-400" : "bg-slate-900 hover:bg-slate-700 dark:bg-slate-700 dark:hover:bg-slate-600"}`,
         onClick,
         disabled,
         "aria-label": ariaLabel,
@@ -761,7 +784,7 @@
       "button",
       {
         "aria-label": "\u590D\u5236",
-        class: "inline-flex shrink-0 cursor-pointer items-center rounded p-1 text-slate-400 hover:bg-slate-200 hover:text-slate-600",
+        class: "inline-flex shrink-0 cursor-pointer items-center rounded p-1 text-slate-400 hover:bg-slate-200 hover:text-slate-600 dark:hover:bg-slate-700 dark:hover:text-slate-300",
         onClick: (e3) => {
           e3.stopPropagation();
           onCopy(text);
@@ -776,6 +799,7 @@
     const [busy, setBusy] = d2(false);
     const [status, setStatus] = d2("");
     const [confirmUninstall, setConfirmUninstall] = d2(false);
+    const [confirmClear, setConfirmClear] = d2(false);
     const [launchItems, setLaunchItems] = d2([]);
     const [autoRefresh, setAutoRefresh] = d2(true);
     const [copied, setCopied] = d2("");
@@ -841,6 +865,11 @@
         if (timer) clearInterval(timer);
       };
     }, [autoRefresh]);
+    y2(() => {
+      if (!confirmClear) return;
+      const t3 = window.setTimeout(() => setConfirmClear(false), 4e3);
+      return () => window.clearTimeout(t3);
+    }, [confirmClear]);
     const run = q2(
       async (fn) => {
         if (!pkg) return;
@@ -853,6 +882,7 @@
         } finally {
           setBusy(false);
           setConfirmUninstall(false);
+          setConfirmClear(false);
         }
       },
       [pkg]
@@ -893,23 +923,24 @@
     }, []);
     const handleStop = q2(() => {
       setConfirmUninstall(false);
+      setConfirmClear(false);
       setAutoRefresh(false);
     }, []);
     return /* @__PURE__ */ u3("div", { children: [
       /* @__PURE__ */ u3("div", { class: "flex items-center gap-1", children: [
-        /* @__PURE__ */ u3("div", { class: "min-w-0 flex-1 break-all rounded-md bg-slate-50 px-3 py-2 font-mono text-sm text-slate-800", children: pkg || "\u672A\u68C0\u6D4B\u5230\u524D\u53F0\u5E94\u7528" }),
+        /* @__PURE__ */ u3("div", { class: "min-w-0 flex-1 break-all rounded-md bg-slate-50 px-3 py-2 font-mono text-sm text-slate-800 dark:bg-slate-800 dark:text-slate-100", children: pkg || "\u672A\u68C0\u6D4B\u5230\u524D\u53F0\u5E94\u7528" }),
         pkg && /* @__PURE__ */ u3(CopyButton, { text: pkg, copied: copied === pkg, onCopy: copyText })
       ] }),
       launchItems.length > 0 && /* @__PURE__ */ u3("div", { class: "mt-3", children: [
-        /* @__PURE__ */ u3("div", { class: "mb-1 text-xs font-medium text-slate-500", children: [
+        /* @__PURE__ */ u3("div", { class: "mb-1 text-xs font-medium text-slate-500 dark:text-slate-400", children: [
           "\u542F\u52A8\u5165\u53E3",
-          /* @__PURE__ */ u3("span", { class: "ml-1 font-normal text-slate-400", children: "\u70B9\u51FB\u5373\u53EF\u542F\u52A8" })
+          /* @__PURE__ */ u3("span", { class: "ml-1 font-normal text-slate-400 dark:text-slate-500", children: "\u70B9\u51FB\u5373\u53EF\u542F\u52A8" })
         ] }),
         /* @__PURE__ */ u3("ul", { class: "space-y-1", children: launchItems.map((component) => /* @__PURE__ */ u3("li", { children: /* @__PURE__ */ u3("div", { class: "flex items-center gap-1", children: [
           /* @__PURE__ */ u3(
             "button",
             {
-              class: "min-w-0 flex-1 cursor-pointer rounded-md bg-slate-50 px-3 py-2 text-left text-xs text-slate-700 hover:bg-slate-100 disabled:opacity-50",
+              class: "min-w-0 flex-1 cursor-pointer rounded-md bg-slate-50 px-3 py-2 text-left text-xs text-slate-700 hover:bg-slate-100 disabled:opacity-50 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700",
               title: component,
               onClick: () => {
                 handleStop();
@@ -923,9 +954,9 @@
         ] }) }, component)) })
       ] }),
       version && /* @__PURE__ */ u3("div", { class: "mt-3", children: [
-        /* @__PURE__ */ u3("div", { class: "mb-1 text-xs font-medium text-slate-500", children: "\u7248\u672C\u53F7" }),
+        /* @__PURE__ */ u3("div", { class: "mb-1 text-xs font-medium text-slate-500 dark:text-slate-400", children: "\u7248\u672C\u53F7" }),
         /* @__PURE__ */ u3("div", { class: "flex items-center gap-1", children: [
-          /* @__PURE__ */ u3("div", { class: "min-w-0 flex-1 break-all rounded-md bg-slate-50 px-3 py-2 font-mono text-xs text-slate-700", children: [
+          /* @__PURE__ */ u3("div", { class: "min-w-0 flex-1 break-all rounded-md bg-slate-50 px-3 py-2 font-mono text-xs text-slate-700 dark:bg-slate-800 dark:text-slate-200", children: [
             version.name,
             " (",
             version.code,
@@ -946,6 +977,18 @@
           /* @__PURE__ */ u3(
             Button,
             {
+              ariaLabel: "\u5F3A\u5236\u505C\u6B62\u5E94\u7528",
+              onClick: () => {
+                handleStop();
+                run(stopApp);
+              },
+              disabled: busy || noPkg,
+              children: /* @__PURE__ */ u3(Square, { class: "h-4 w-4 fill-current" })
+            }
+          ),
+          /* @__PURE__ */ u3(
+            Button,
+            {
               ariaLabel: "\u5378\u8F7D\u5E94\u7528",
               danger: true,
               onClick: () => {
@@ -959,13 +1002,23 @@
           /* @__PURE__ */ u3(
             Button,
             {
-              ariaLabel: "\u5F3A\u5236\u505C\u6B62\u5E94\u7528",
+              ariaLabel: "\u6E05\u7A7A\u5E94\u7528\u6570\u636E",
+              armed: confirmClear,
               onClick: () => {
-                handleStop();
-                run(stopApp);
+                setConfirmUninstall(false);
+                setAutoRefresh(false);
+                if (confirmClear) {
+                  setConfirmClear(false);
+                  run(clearDataApp);
+                } else {
+                  setConfirmClear(true);
+                }
               },
               disabled: busy || noPkg,
-              children: /* @__PURE__ */ u3(Square, { class: "h-4 w-4 fill-current" })
+              children: [
+                /* @__PURE__ */ u3(Eraser, { class: "h-4 w-4" }),
+                confirmClear && "\u786E\u8BA4?"
+              ]
             }
           )
         ] }),
@@ -973,7 +1026,7 @@
           "button",
           {
             "aria-label": autoRefresh ? "\u505C\u6B62\u81EA\u52A8\u5237\u65B0" : "\u5F00\u542F\u81EA\u52A8\u5237\u65B0\u5E76\u5237\u65B0",
-            class: `inline-flex cursor-pointer items-center rounded-md px-2 py-1.5 disabled:opacity-50 ${autoRefresh ? "bg-indigo-600 text-white hover:bg-indigo-500" : "bg-slate-100 text-slate-700 hover:bg-slate-200"}`,
+            class: `inline-flex cursor-pointer items-center rounded-md px-2 py-1.5 disabled:opacity-50 ${autoRefresh ? "bg-indigo-600 text-white hover:bg-indigo-500" : "bg-slate-100 text-slate-700 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700"}`,
             onClick: () => {
               if (autoRefresh) {
                 setAutoRefresh(false);
@@ -993,8 +1046,8 @@
           }
         )
       ] }),
-      confirmUninstall && /* @__PURE__ */ u3("div", { class: "rounded-md border border-red-200 bg-red-50 p-2", children: [
-        /* @__PURE__ */ u3("p", { class: "mb-2 text-xs text-red-700", children: [
+      confirmUninstall && /* @__PURE__ */ u3("div", { class: "rounded-md border border-red-200 bg-red-50 p-2 dark:border-red-900 dark:bg-red-950", children: [
+        /* @__PURE__ */ u3("p", { class: "mb-2 text-xs text-red-700 dark:text-red-300", children: [
           "\u786E\u8BA4\u5378\u8F7D ",
           /* @__PURE__ */ u3("span", { class: "font-mono font-semibold", children: pkg }),
           " \u5417\uFF1F"
@@ -1015,7 +1068,7 @@
           /* @__PURE__ */ u3(Button, { onClick: () => setConfirmUninstall(false), disabled: busy, children: "\u53D6\u6D88" })
         ] })
       ] }),
-      status && /* @__PURE__ */ u3("div", { class: "mt-3 break-all rounded-md bg-slate-100 p-2 text-xs text-slate-600", children: status })
+      status && /* @__PURE__ */ u3("div", { class: "mt-3 break-all rounded-md bg-slate-100 p-2 text-xs text-slate-600 dark:bg-slate-800 dark:text-slate-300", children: status })
     ] });
   }
   R(/* @__PURE__ */ u3(App, {}), document.getElementById("app"));
@@ -1035,6 +1088,7 @@ lucide-preact/dist/esm/Icon.mjs:
 lucide-preact/dist/esm/createLucideIcon.mjs:
 lucide-preact/dist/esm/icons/check.mjs:
 lucide-preact/dist/esm/icons/copy.mjs:
+lucide-preact/dist/esm/icons/eraser.mjs:
 lucide-preact/dist/esm/icons/refresh-cw.mjs:
 lucide-preact/dist/esm/icons/square.mjs:
 lucide-preact/dist/esm/icons/trash.mjs:
