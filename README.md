@@ -46,6 +46,10 @@ npm run build        # Compile Tailwind into app.css and bundle app.tsx into app
 npm run fetch-types  # Fetch the latest type definitions (requires uiauto.dev running)
 ```
 
+## License
+
+[MIT](./LICENSE)
+
 ## Tech Stack
 
 - **Preact** — lightweight UI framework

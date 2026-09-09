@@ -46,6 +46,10 @@ npm run build        # 编译 Tailwind 为 app.css 并打包 app.tsx 为 app.js
 npm run fetch-types  # 拉取最新类型定义（需 uiauto.dev 运行中）
 ```
 
+## 许可证
+
+[MIT](./LICENSE)
+
 ## 技术栈
 
 - **Preact** — 轻量 UI 框架
