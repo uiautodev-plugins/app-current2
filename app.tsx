@@ -266,7 +266,7 @@ function App() {
     let timer: ReturnType<typeof setInterval> | undefined;
 
     const poll = async () => {
-      if (pollingRef.current) return;
+      if (pollingRef.current || document.hidden) return;
       pollingRef.current = true;
       try {
         const { pkg: p, activity: a } = await getCurrentApp();

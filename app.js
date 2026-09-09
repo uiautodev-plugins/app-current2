@@ -990,7 +990,7 @@
       let cancelled = false;
       let timer;
       const poll = async () => {
-        if (pollingRef.current) return;
+        if (pollingRef.current || document.hidden) return;
         pollingRef.current = true;
         try {
           const { pkg: p3, activity: a3 } = await getCurrentApp();
