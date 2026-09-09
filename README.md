@@ -1,6 +1,6 @@
 # Current App
 
-A [uiauto.dev](https://github.com/nicepkg/uiautodev) plugin: gets the package name of the current foreground app, with support for launching, force-stopping, and uninstalling it. [中文](./README.zh-CN.md)
+A [uiauto.dev](https://get.uiauto.dev) plugin: gets the package name of the current foreground app, with support for launching, force-stopping, and uninstalling it. [中文](./README.zh-CN.md)
 
 ## Features
 

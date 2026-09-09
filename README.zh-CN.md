@@ -1,6 +1,6 @@
 # 当前应用
 
-一个 [uiauto.dev](https://github.com/nicepkg/uiautodev) 插件：获取当前前台应用的包名，并支持启动、强制停止与卸载。[English](./README.md)
+一个 [uiauto.dev](https://get.uiauto.dev) 插件：获取当前前台应用的包名，并支持启动、强制停止与卸载。[English](./README.md)
 
 ## 功能
 
