@@ -792,15 +792,29 @@
     const result = await $u.shell(cmd);
     return result.output.trim();
   }
-  var FOCUS_RE = /(?:mCurrentFocus|mFocusedApp)=.*?\bu\d+\s+([\w.]+)\/([^\s}]+)/;
+  var FOCUS_RE = /mCurrentFocus=Window\{.*?\s+([^\s]+)\/([^\s]+)\}/;
+  var RESUMED_RE = /mResumedActivity: ActivityRecord\{.*?\s+([^\s]+)\/([^\s]+)\s.*?\}/;
+  var TOP_RE = /ACTIVITY ([^\s]+)\/([^/\s]+) \w+ pid=(\d+)/g;
+  function normalize(pkg, activity) {
+    const a3 = activity.startsWith(".") ? `${pkg}${activity}` : activity;
+    return { pkg, activity: a3 };
+  }
   async function getCurrentApp() {
-    const out = await shell('dumpsys window | grep -E "mCurrentFocus|mFocusedApp"');
-    const line = out.split("\n").find((l3) => l3.includes("mCurrentFocus"))?.match(FOCUS_RE);
-    const m3 = line ?? out.match(FOCUS_RE);
-    if (!m3) return { pkg: "", activity: "" };
-    const [, pkg, raw] = m3;
-    const activity = raw.startsWith(".") ? `${pkg}${raw}` : raw;
-    return { pkg, activity };
+    const windowOut = await shell("dumpsys window windows");
+    const focusM = windowOut.match(FOCUS_RE);
+    if (focusM) return normalize(focusM[1], focusM[2]);
+    let resumedPkg = "";
+    const activitiesOut = await shell("dumpsys activity activities");
+    const resumedM = activitiesOut.match(RESUMED_RE);
+    if (resumedM) resumedPkg = resumedM[1];
+    const topOut = await shell("dumpsys activity top");
+    const matches = [...topOut.matchAll(TOP_RE)];
+    for (const m3 of matches) {
+      if (m3[1] === resumedPkg) return normalize(m3[1], m3[2]);
+    }
+    const last = matches[matches.length - 1];
+    if (last) return normalize(last[1], last[2]);
+    return { pkg: "", activity: "" };
   }
   async function listLauncherActivities(pkg) {
     const out = await shell(

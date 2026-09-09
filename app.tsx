@@ -18,19 +18,42 @@ async function shell(cmd: string): Promise<string> {
   return result.output.trim();
 }
 
-const FOCUS_RE = /(?:mCurrentFocus|mFocusedApp)=.*?\bu\d+\s+([\w.]+)\/([^\s}]+)/;
+const FOCUS_RE = /mCurrentFocus=Window\{.*?\s+([^\s]+)\/([^\s]+)\}/;
+const RESUMED_RE = /mResumedActivity: ActivityRecord\{.*?\s+([^\s]+)\/([^\s]+)\s.*?\}/;
+const TOP_RE = /ACTIVITY ([^\s]+)\/([^/\s]+) \w+ pid=(\d+)/g;
+
+function normalize(
+  pkg: string,
+  activity: string,
+): {
+  pkg: string;
+  activity: string;
+} {
+  const a = activity.startsWith('.') ? `${pkg}${activity}` : activity;
+  return { pkg, activity: a };
+}
 
 async function getCurrentApp(): Promise<{ pkg: string; activity: string }> {
-  const out = await shell('dumpsys window | grep -E "mCurrentFocus|mFocusedApp"');
-  const line = out
-    .split('\n')
-    .find((l) => l.includes('mCurrentFocus'))
-    ?.match(FOCUS_RE);
-  const m = line ?? out.match(FOCUS_RE);
-  if (!m) return { pkg: '', activity: '' };
-  const [, pkg, raw] = m;
-  const activity = raw.startsWith('.') ? `${pkg}${raw}` : raw;
-  return { pkg, activity };
+  // 1. mCurrentFocus
+  const windowOut = await shell('dumpsys window windows');
+  const focusM = windowOut.match(FOCUS_RE);
+  if (focusM) return normalize(focusM[1], focusM[2]);
+
+  // 2. mResumedActivity: 获取当前前台包的包名
+  let resumedPkg = '';
+  const activitiesOut = await shell('dumpsys activity activities');
+  const resumedM = activitiesOut.match(RESUMED_RE);
+  if (resumedM) resumedPkg = resumedM[1];
+
+  // 3. dumpsys activity top: 逐条匹配，命中包名即返回，否则取最后一条
+  const topOut = await shell('dumpsys activity top');
+  const matches = [...topOut.matchAll(TOP_RE)];
+  for (const m of matches) {
+    if (m[1] === resumedPkg) return normalize(m[1], m[2]);
+  }
+  const last = matches[matches.length - 1];
+  if (last) return normalize(last[1], last[2]);
+  return { pkg: '', activity: '' };
 }
 
 async function listLauncherActivities(pkg: string): Promise<string[]> {
