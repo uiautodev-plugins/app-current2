@@ -1,7 +1,7 @@
 /// <reference path="./plugin-runtime.d.ts" />
 import { render } from 'preact';
 import { useState, useCallback, useEffect, useRef } from 'preact/hooks';
-import { Trash2, Square, RefreshCw } from 'lucide-preact';
+import { Trash2, Square, RefreshCw, Copy, Check } from 'lucide-preact';
 
 async function shell(cmd: string): Promise<string> {
   const result = await $u.shell(cmd);
@@ -26,13 +26,17 @@ async function listLauncherActivities(pkg: string): Promise<string[]> {
     .filter((l) => l.includes('/') && !l.includes('='));
 }
 
+async function getAppVersion(pkg: string): Promise<{ name: string; code: string } | null> {
+  const out = await shell(`dumpsys package ${pkg}`);
+  const name = out.match(/versionName=([^\s]+)/);
+  const code = out.match(/versionCode=(\d+)/);
+  if (!name && !code) return null;
+  return { name: name?.[1] ?? '', code: code?.[1] ?? '' };
+}
+
 async function doLaunch(component: string): Promise<string> {
   const r = await shell(`am start -n ${component}`);
   return r && r.toLowerCase().includes('error') ? `启动失败: ${r}` : `已启动 ${component}`;
-}
-
-function shortName(component: string): string {
-  return component;
 }
 
 async function stopApp(pkg: string): Promise<string> {
@@ -75,25 +79,57 @@ function Button({
   );
 }
 
+function CopyButton({
+  text,
+  copied,
+  onCopy,
+}: {
+  text: string;
+  copied: boolean;
+  onCopy: (text: string) => void;
+}) {
+  return (
+    <button
+      aria-label="复制"
+      class="inline-flex shrink-0 cursor-pointer items-center rounded p-1 text-slate-400 hover:bg-slate-200 hover:text-slate-600"
+      onClick={(e) => {
+        e.stopPropagation();
+        onCopy(text);
+      }}
+    >
+      {copied ? <Check class="h-3.5 w-3.5 text-emerald-500" /> : <Copy class="h-3.5 w-3.5" />}
+    </button>
+  );
+}
+
 function App() {
   const [pkg, setPkg] = useState('');
+  const [version, setVersion] = useState<{ name: string; code: string } | null>(null);
   const [busy, setBusy] = useState(false);
   const [status, setStatus] = useState('');
   const [confirmUninstall, setConfirmUninstall] = useState(false);
   const [launchItems, setLaunchItems] = useState<string[]>([]);
   const [autoRefresh, setAutoRefresh] = useState(true);
+  const [copied, setCopied] = useState('');
   const pollingRef = useRef(false);
+
+  const loadAppInfo = useCallback(async (p: string) => {
+    const [items, ver] = await Promise.all([listLauncherActivities(p), getAppVersion(p)]);
+    setLaunchItems(items);
+    setVersion(ver);
+  }, []);
 
   const pollOnce = useCallback(async (): Promise<string> => {
     const p = await getCurrentPackage();
     setPkg(p);
     if (p) {
-      setLaunchItems(await listLauncherActivities(p));
+      await loadAppInfo(p);
     } else {
       setLaunchItems([]);
+      setVersion(null);
     }
     return p;
-  }, []);
+  }, [loadAppInfo]);
 
   const refresh = useCallback(async () => {
     setBusy(true);
@@ -122,9 +158,13 @@ function App() {
         setPkg(p);
         if (p) {
           const items = await listLauncherActivities(p);
-          if (!cancelled) setLaunchItems(items);
+          const ver = await getAppVersion(p);
+          if (cancelled) return;
+          setLaunchItems(items);
+          setVersion(ver);
         } else {
           setLaunchItems([]);
+          setVersion(null);
         }
       } catch {
         // ignore transient failures during auto refresh
@@ -172,6 +212,29 @@ function App() {
 
   const noPkg = !pkg;
 
+  const copyText = useCallback(async (text: string) => {
+    let ok = false;
+    try {
+      await navigator.clipboard.writeText(text);
+      ok = true;
+    } catch {
+      const ta = document.createElement('textarea');
+      ta.value = text;
+      ta.style.position = 'fixed';
+      ta.style.opacity = '0';
+      document.body.appendChild(ta);
+      ta.select();
+      ok = document.execCommand('copy');
+      document.body.removeChild(ta);
+    }
+    if (ok) {
+      setCopied(text);
+      window.setTimeout(() => setCopied(''), 1500);
+    } else {
+      setStatus('复制失败');
+    }
+  }, []);
+
   const handleStop = useCallback(() => {
     setConfirmUninstall(false);
     setAutoRefresh(false);
@@ -179,30 +242,54 @@ function App() {
 
   return (
     <div>
-      <div class="break-all rounded-md bg-slate-50 p-2 font-mono text-sm text-slate-800">
-        {pkg || '未检测到前台应用'}
+      <div class="flex items-center gap-1">
+        <div class="min-w-0 flex-1 break-all rounded-md bg-slate-50 px-3 py-2 font-mono text-sm text-slate-800">
+          {pkg || '未检测到前台应用'}
+        </div>
+        {pkg && <CopyButton text={pkg} copied={copied === pkg} onCopy={copyText} />}
       </div>
 
       {launchItems.length > 0 && (
-        <div class="mb-3">
-          <div class="mb-1 text-xs font-medium text-slate-500">启动入口</div>
+        <div class="mt-3">
+          <div class="mb-1 text-xs font-medium text-slate-500">
+            启动入口<span class="ml-1 font-normal text-slate-400">点击即可启动</span>
+          </div>
           <ul class="space-y-1">
             {launchItems.map((component) => (
               <li key={component}>
-                <button
-                  class="w-full cursor-pointer rounded-md bg-slate-50 px-3 py-2 text-left text-xs text-slate-700 hover:bg-slate-100 disabled:opacity-50"
-                  title={component}
-                  onClick={() => {
-                    handleStop();
-                    launchItem(component);
-                  }}
-                  disabled={busy}
-                >
-                  {component.slice(component.indexOf('/') + 1)}
-                </button>
+                <div class="flex items-center gap-1">
+                  <button
+                    class="min-w-0 flex-1 cursor-pointer rounded-md bg-slate-50 px-3 py-2 text-left text-xs text-slate-700 hover:bg-slate-100 disabled:opacity-50"
+                    title={component}
+                    onClick={() => {
+                      handleStop();
+                      launchItem(component);
+                    }}
+                    disabled={busy}
+                  >
+                    <span class="break-all">{component.slice(component.indexOf('/') + 1)}</span>
+                  </button>
+                  <CopyButton text={component} copied={copied === component} onCopy={copyText} />
+                </div>
               </li>
             ))}
           </ul>
+        </div>
+      )}
+
+      {version && (
+        <div class="mt-3">
+          <div class="mb-1 text-xs font-medium text-slate-500">版本号</div>
+          <div class="flex items-center gap-1">
+            <div class="min-w-0 flex-1 break-all rounded-md bg-slate-50 px-3 py-2 font-mono text-xs text-slate-700">
+              {version.name} ({version.code})
+            </div>
+            <CopyButton
+              text={`${version.name} (${version.code})`}
+              copied={copied === `${version.name} (${version.code})`}
+              onCopy={copyText}
+            />
+          </div>
         </div>
       )}
 

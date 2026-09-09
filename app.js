@@ -615,24 +615,43 @@
 
   // node_modules/lucide-preact/dist/esm/createLucideIcon.mjs
   function createLucideIcon(iconDataOrName, iconNode, aliases = []) {
-    const iconData4 = typeof iconDataOrName === "string" ? toLucideIconData(iconDataOrName, iconNode, aliases) : iconDataOrName;
+    const iconData6 = typeof iconDataOrName === "string" ? toLucideIconData(iconDataOrName, iconNode, aliases) : iconDataOrName;
     const Component = ({ class: classes = "", className = "", children, ...props }) => k(
       Icon,
       {
         ...props,
-        icon: iconData4,
+        icon: iconData6,
         class: mergeClasses(classes, className)
       },
       children
     );
-    if (iconData4.name) {
-      Component.displayName = toPascalCase(iconData4.name);
+    if (iconData6.name) {
+      Component.displayName = toPascalCase(iconData6.name);
     }
     return Component;
   }
 
-  // node_modules/lucide-preact/dist/esm/icons/refresh-cw.mjs
+  // node_modules/lucide-preact/dist/esm/icons/check.mjs
   var iconData = {
+    name: "check",
+    size: 24,
+    node: [["path", { d: "M20 6 9 17l-5-5", key: "1gmf2c" }]]
+  };
+  var Check = createLucideIcon(iconData);
+
+  // node_modules/lucide-preact/dist/esm/icons/copy.mjs
+  var iconData2 = {
+    name: "copy",
+    size: 24,
+    node: [
+      ["rect", { width: "14", height: "14", x: "8", y: "8", rx: "2", ry: "2", key: "17jyea" }],
+      ["path", { d: "M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2", key: "zix9uf" }]
+    ]
+  };
+  var Copy = createLucideIcon(iconData2);
+
+  // node_modules/lucide-preact/dist/esm/icons/refresh-cw.mjs
+  var iconData3 = {
     name: "refresh-cw",
     size: 24,
     node: [
@@ -642,18 +661,18 @@
       ["path", { d: "M8 16H3v5", key: "1cv678" }]
     ]
   };
-  var RefreshCw = createLucideIcon(iconData);
+  var RefreshCw = createLucideIcon(iconData3);
 
   // node_modules/lucide-preact/dist/esm/icons/square.mjs
-  var iconData2 = {
+  var iconData4 = {
     name: "square",
     size: 24,
     node: [["rect", { width: "18", height: "18", x: "3", y: "3", rx: "2", key: "afitv7" }]]
   };
-  var Square = createLucideIcon(iconData2);
+  var Square = createLucideIcon(iconData4);
 
   // node_modules/lucide-preact/dist/esm/icons/trash.mjs
-  var iconData3 = {
+  var iconData5 = {
     name: "trash",
     size: 24,
     node: [
@@ -665,7 +684,7 @@
     ],
     aliases: ["trash-2"]
   };
-  var Trash = createLucideIcon(iconData3);
+  var Trash = createLucideIcon(iconData5);
 
   // node_modules/preact/jsx-runtime/dist/jsxRuntime.module.js
   var f3 = 0;
@@ -694,6 +713,13 @@
       `cmd package query-activities --brief -a android.intent.action.MAIN -c android.intent.category.LAUNCHER ${pkg}`
     );
     return out.split("\n").map((l3) => l3.trim()).filter((l3) => l3.includes("/") && !l3.includes("="));
+  }
+  async function getAppVersion(pkg) {
+    const out = await shell(`dumpsys package ${pkg}`);
+    const name = out.match(/versionName=([^\s]+)/);
+    const code = out.match(/versionCode=(\d+)/);
+    if (!name && !code) return null;
+    return { name: name?.[1] ?? "", code: code?.[1] ?? "" };
   }
   async function doLaunch(component) {
     const r3 = await shell(`am start -n ${component}`);
@@ -726,24 +752,50 @@
       }
     );
   }
+  function CopyButton({
+    text,
+    copied,
+    onCopy
+  }) {
+    return /* @__PURE__ */ u3(
+      "button",
+      {
+        "aria-label": "\u590D\u5236",
+        class: "inline-flex shrink-0 cursor-pointer items-center rounded p-1 text-slate-400 hover:bg-slate-200 hover:text-slate-600",
+        onClick: (e3) => {
+          e3.stopPropagation();
+          onCopy(text);
+        },
+        children: copied ? /* @__PURE__ */ u3(Check, { class: "h-3.5 w-3.5 text-emerald-500" }) : /* @__PURE__ */ u3(Copy, { class: "h-3.5 w-3.5" })
+      }
+    );
+  }
   function App() {
     const [pkg, setPkg] = d2("");
+    const [version, setVersion] = d2(null);
     const [busy, setBusy] = d2(false);
     const [status, setStatus] = d2("");
     const [confirmUninstall, setConfirmUninstall] = d2(false);
     const [launchItems, setLaunchItems] = d2([]);
     const [autoRefresh, setAutoRefresh] = d2(true);
+    const [copied, setCopied] = d2("");
     const pollingRef = A2(false);
+    const loadAppInfo = q2(async (p3) => {
+      const [items, ver] = await Promise.all([listLauncherActivities(p3), getAppVersion(p3)]);
+      setLaunchItems(items);
+      setVersion(ver);
+    }, []);
     const pollOnce = q2(async () => {
       const p3 = await getCurrentPackage();
       setPkg(p3);
       if (p3) {
-        setLaunchItems(await listLauncherActivities(p3));
+        await loadAppInfo(p3);
       } else {
         setLaunchItems([]);
+        setVersion(null);
       }
       return p3;
-    }, []);
+    }, [loadAppInfo]);
     const refresh = q2(async () => {
       setBusy(true);
       setStatus("");
@@ -769,9 +821,13 @@
           setPkg(p3);
           if (p3) {
             const items = await listLauncherActivities(p3);
-            if (!cancelled) setLaunchItems(items);
+            const ver = await getAppVersion(p3);
+            if (cancelled) return;
+            setLaunchItems(items);
+            setVersion(ver);
           } else {
             setLaunchItems([]);
+            setVersion(null);
           }
         } catch {
         } finally {
@@ -813,27 +869,77 @@
       }
     }, []);
     const noPkg = !pkg;
+    const copyText = q2(async (text) => {
+      let ok = false;
+      try {
+        await navigator.clipboard.writeText(text);
+        ok = true;
+      } catch {
+        const ta = document.createElement("textarea");
+        ta.value = text;
+        ta.style.position = "fixed";
+        ta.style.opacity = "0";
+        document.body.appendChild(ta);
+        ta.select();
+        ok = document.execCommand("copy");
+        document.body.removeChild(ta);
+      }
+      if (ok) {
+        setCopied(text);
+        window.setTimeout(() => setCopied(""), 1500);
+      } else {
+        setStatus("\u590D\u5236\u5931\u8D25");
+      }
+    }, []);
     const handleStop = q2(() => {
       setConfirmUninstall(false);
       setAutoRefresh(false);
     }, []);
     return /* @__PURE__ */ u3("div", { children: [
-      /* @__PURE__ */ u3("div", { class: "break-all rounded-md bg-slate-50 p-2 font-mono text-sm text-slate-800", children: pkg || "\u672A\u68C0\u6D4B\u5230\u524D\u53F0\u5E94\u7528" }),
-      launchItems.length > 0 && /* @__PURE__ */ u3("div", { class: "mb-3", children: [
-        /* @__PURE__ */ u3("div", { class: "mb-1 text-xs font-medium text-slate-500", children: "\u542F\u52A8\u5165\u53E3" }),
-        /* @__PURE__ */ u3("ul", { class: "space-y-1", children: launchItems.map((component) => /* @__PURE__ */ u3("li", { children: /* @__PURE__ */ u3(
-          "button",
-          {
-            class: "w-full cursor-pointer rounded-md bg-slate-50 px-3 py-2 text-left text-xs text-slate-700 hover:bg-slate-100 disabled:opacity-50",
-            title: component,
-            onClick: () => {
-              handleStop();
-              launchItem(component);
-            },
-            disabled: busy,
-            children: component.slice(component.indexOf("/") + 1)
-          }
-        ) }, component)) })
+      /* @__PURE__ */ u3("div", { class: "flex items-center gap-1", children: [
+        /* @__PURE__ */ u3("div", { class: "min-w-0 flex-1 break-all rounded-md bg-slate-50 px-3 py-2 font-mono text-sm text-slate-800", children: pkg || "\u672A\u68C0\u6D4B\u5230\u524D\u53F0\u5E94\u7528" }),
+        pkg && /* @__PURE__ */ u3(CopyButton, { text: pkg, copied: copied === pkg, onCopy: copyText })
+      ] }),
+      launchItems.length > 0 && /* @__PURE__ */ u3("div", { class: "mt-3", children: [
+        /* @__PURE__ */ u3("div", { class: "mb-1 text-xs font-medium text-slate-500", children: [
+          "\u542F\u52A8\u5165\u53E3",
+          /* @__PURE__ */ u3("span", { class: "ml-1 font-normal text-slate-400", children: "\u70B9\u51FB\u5373\u53EF\u542F\u52A8" })
+        ] }),
+        /* @__PURE__ */ u3("ul", { class: "space-y-1", children: launchItems.map((component) => /* @__PURE__ */ u3("li", { children: /* @__PURE__ */ u3("div", { class: "flex items-center gap-1", children: [
+          /* @__PURE__ */ u3(
+            "button",
+            {
+              class: "min-w-0 flex-1 cursor-pointer rounded-md bg-slate-50 px-3 py-2 text-left text-xs text-slate-700 hover:bg-slate-100 disabled:opacity-50",
+              title: component,
+              onClick: () => {
+                handleStop();
+                launchItem(component);
+              },
+              disabled: busy,
+              children: /* @__PURE__ */ u3("span", { class: "break-all", children: component.slice(component.indexOf("/") + 1) })
+            }
+          ),
+          /* @__PURE__ */ u3(CopyButton, { text: component, copied: copied === component, onCopy: copyText })
+        ] }) }, component)) })
+      ] }),
+      version && /* @__PURE__ */ u3("div", { class: "mt-3", children: [
+        /* @__PURE__ */ u3("div", { class: "mb-1 text-xs font-medium text-slate-500", children: "\u7248\u672C\u53F7" }),
+        /* @__PURE__ */ u3("div", { class: "flex items-center gap-1", children: [
+          /* @__PURE__ */ u3("div", { class: "min-w-0 flex-1 break-all rounded-md bg-slate-50 px-3 py-2 font-mono text-xs text-slate-700", children: [
+            version.name,
+            " (",
+            version.code,
+            ")"
+          ] }),
+          /* @__PURE__ */ u3(
+            CopyButton,
+            {
+              text: `${version.name} (${version.code})`,
+              copied: copied === `${version.name} (${version.code})`,
+              onCopy: copyText
+            }
+          )
+        ] })
       ] }),
       /* @__PURE__ */ u3("div", { class: "mt-4 mb-2 flex items-center justify-between", children: [
         /* @__PURE__ */ u3("div", { class: "flex gap-2", children: [
@@ -927,6 +1033,8 @@ lucide-preact/dist/esm/shared/src/utils/hasA11yProp.mjs:
 lucide-preact/dist/esm/context.mjs:
 lucide-preact/dist/esm/Icon.mjs:
 lucide-preact/dist/esm/createLucideIcon.mjs:
+lucide-preact/dist/esm/icons/check.mjs:
+lucide-preact/dist/esm/icons/copy.mjs:
 lucide-preact/dist/esm/icons/refresh-cw.mjs:
 lucide-preact/dist/esm/icons/square.mjs:
 lucide-preact/dist/esm/icons/trash.mjs:
