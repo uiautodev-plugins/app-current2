@@ -423,7 +423,8 @@ function App() {
                     class="min-w-0 flex-1 cursor-pointer rounded-md bg-slate-50 px-3 py-2 text-left text-xs text-slate-700 hover:bg-slate-100 disabled:opacity-50 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700"
                     title={component}
                     onClick={() => {
-                      handleStop();
+                      setConfirmUninstall(false);
+                      setConfirmClear(false);
                       launchItem(component);
                     }}
                     disabled={busy}
@@ -444,6 +445,28 @@ function App() {
       )}
 
       <div class="mt-4 mb-2 flex items-center justify-between">
+        <button
+          aria-label={autoRefresh ? '停止自动刷新' : '开启自动刷新并刷新'}
+          class={`inline-flex cursor-pointer items-center rounded-md px-2 py-1.5 disabled:opacity-50 ${
+            autoRefresh
+              ? 'bg-emerald-500 text-white hover:bg-emerald-400'
+              : 'bg-slate-100 text-slate-700 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700'
+          }`}
+          onClick={() => {
+            if (autoRefresh) {
+              setAutoRefresh(false);
+            } else {
+              setAutoRefresh(true);
+              refresh();
+            }
+          }}
+          disabled={busy}
+        >
+          <RefreshCw
+            class={`h-4 w-4 ${autoRefresh ? 'animate-spin' : ''}`}
+            style={autoRefresh ? { animationDuration: '2s' } : undefined}
+          />
+        </button>
         <div class="flex gap-2">
           <Button
             ariaLabel="强制停止应用"
@@ -454,25 +477,6 @@ function App() {
             disabled={busy || noPkg}
           >
             <Square class="h-4 w-4 fill-current" />
-          </Button>
-          <Button
-            ariaLabel="卸载应用"
-            danger
-            armed={confirmUninstall}
-            onClick={() => {
-              setConfirmClear(false);
-              setAutoRefresh(false);
-              if (confirmUninstall) {
-                setConfirmUninstall(false);
-                run(uninstallApp);
-              } else {
-                setConfirmUninstall(true);
-              }
-            }}
-            disabled={busy || noPkg}
-          >
-            <Trash2 class="h-4 w-4" />
-            {confirmUninstall && '确认?'}
           </Button>
           <Button
             ariaLabel="清空应用数据"
@@ -492,29 +496,25 @@ function App() {
             <Eraser class="h-4 w-4" />
             {confirmClear && '确认?'}
           </Button>
+          <Button
+            ariaLabel="卸载应用"
+            danger
+            armed={confirmUninstall}
+            onClick={() => {
+              setConfirmClear(false);
+              if (confirmUninstall) {
+                setConfirmUninstall(false);
+                run(uninstallApp);
+              } else {
+                setConfirmUninstall(true);
+              }
+            }}
+            disabled={busy || noPkg}
+          >
+            <Trash2 class="h-4 w-4" />
+            {confirmUninstall && '确认?'}
+          </Button>
         </div>
-        <button
-          aria-label={autoRefresh ? '停止自动刷新' : '开启自动刷新并刷新'}
-          class={`inline-flex cursor-pointer items-center rounded-md px-2 py-1.5 disabled:opacity-50 ${
-            autoRefresh
-              ? 'bg-indigo-600 text-white hover:bg-indigo-500'
-              : 'bg-slate-100 text-slate-700 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700'
-          }`}
-          onClick={() => {
-            if (autoRefresh) {
-              setAutoRefresh(false);
-            } else {
-              setAutoRefresh(true);
-              refresh();
-            }
-          }}
-          disabled={busy}
-        >
-          <RefreshCw
-            class={`h-4 w-4 ${autoRefresh ? 'animate-spin' : ''}`}
-            style={autoRefresh ? { animationDuration: '2s' } : undefined}
-          />
-        </button>
       </div>
 
       {savedItems.length > 0 && (
@@ -531,7 +531,8 @@ function App() {
                     class="min-w-0 flex-1 cursor-pointer rounded-md bg-amber-50 px-3 py-2 text-left text-xs text-slate-700 hover:bg-amber-100 disabled:opacity-50 dark:bg-amber-950 dark:text-slate-200 dark:hover:bg-amber-900"
                     title={component}
                     onClick={() => {
-                      handleStop();
+                      setConfirmUninstall(false);
+                      setConfirmClear(false);
                       launchItem(component);
                     }}
                     disabled={busy}

@@ -1133,7 +1133,8 @@
               class: "min-w-0 flex-1 cursor-pointer rounded-md bg-slate-50 px-3 py-2 text-left text-xs text-slate-700 hover:bg-slate-100 disabled:opacity-50 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700",
               title: component,
               onClick: () => {
-                handleStop();
+                setConfirmUninstall(false);
+                setConfirmClear(false);
                 launchItem(component);
               },
               disabled: busy,
@@ -1152,6 +1153,29 @@
         ] }) }, component)) })
       ] }),
       /* @__PURE__ */ u3("div", { class: "mt-4 mb-2 flex items-center justify-between", children: [
+        /* @__PURE__ */ u3(
+          "button",
+          {
+            "aria-label": autoRefresh ? "\u505C\u6B62\u81EA\u52A8\u5237\u65B0" : "\u5F00\u542F\u81EA\u52A8\u5237\u65B0\u5E76\u5237\u65B0",
+            class: `inline-flex cursor-pointer items-center rounded-md px-2 py-1.5 disabled:opacity-50 ${autoRefresh ? "bg-emerald-500 text-white hover:bg-emerald-400" : "bg-slate-100 text-slate-700 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700"}`,
+            onClick: () => {
+              if (autoRefresh) {
+                setAutoRefresh(false);
+              } else {
+                setAutoRefresh(true);
+                refresh();
+              }
+            },
+            disabled: busy,
+            children: /* @__PURE__ */ u3(
+              RefreshCw,
+              {
+                class: `h-4 w-4 ${autoRefresh ? "animate-spin" : ""}`,
+                style: autoRefresh ? { animationDuration: "2s" } : void 0
+              }
+            )
+          }
+        ),
         /* @__PURE__ */ u3("div", { class: "flex gap-2", children: [
           /* @__PURE__ */ u3(
             Button,
@@ -1163,29 +1187,6 @@
               },
               disabled: busy || noPkg,
               children: /* @__PURE__ */ u3(Square, { class: "h-4 w-4 fill-current" })
-            }
-          ),
-          /* @__PURE__ */ u3(
-            Button,
-            {
-              ariaLabel: "\u5378\u8F7D\u5E94\u7528",
-              danger: true,
-              armed: confirmUninstall,
-              onClick: () => {
-                setConfirmClear(false);
-                setAutoRefresh(false);
-                if (confirmUninstall) {
-                  setConfirmUninstall(false);
-                  run(uninstallApp);
-                } else {
-                  setConfirmUninstall(true);
-                }
-              },
-              disabled: busy || noPkg,
-              children: [
-                /* @__PURE__ */ u3(Trash, { class: "h-4 w-4" }),
-                confirmUninstall && "\u786E\u8BA4?"
-              ]
             }
           ),
           /* @__PURE__ */ u3(
@@ -1209,31 +1210,30 @@
                 confirmClear && "\u786E\u8BA4?"
               ]
             }
+          ),
+          /* @__PURE__ */ u3(
+            Button,
+            {
+              ariaLabel: "\u5378\u8F7D\u5E94\u7528",
+              danger: true,
+              armed: confirmUninstall,
+              onClick: () => {
+                setConfirmClear(false);
+                if (confirmUninstall) {
+                  setConfirmUninstall(false);
+                  run(uninstallApp);
+                } else {
+                  setConfirmUninstall(true);
+                }
+              },
+              disabled: busy || noPkg,
+              children: [
+                /* @__PURE__ */ u3(Trash, { class: "h-4 w-4" }),
+                confirmUninstall && "\u786E\u8BA4?"
+              ]
+            }
           )
-        ] }),
-        /* @__PURE__ */ u3(
-          "button",
-          {
-            "aria-label": autoRefresh ? "\u505C\u6B62\u81EA\u52A8\u5237\u65B0" : "\u5F00\u542F\u81EA\u52A8\u5237\u65B0\u5E76\u5237\u65B0",
-            class: `inline-flex cursor-pointer items-center rounded-md px-2 py-1.5 disabled:opacity-50 ${autoRefresh ? "bg-indigo-600 text-white hover:bg-indigo-500" : "bg-slate-100 text-slate-700 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700"}`,
-            onClick: () => {
-              if (autoRefresh) {
-                setAutoRefresh(false);
-              } else {
-                setAutoRefresh(true);
-                refresh();
-              }
-            },
-            disabled: busy,
-            children: /* @__PURE__ */ u3(
-              RefreshCw,
-              {
-                class: `h-4 w-4 ${autoRefresh ? "animate-spin" : ""}`,
-                style: autoRefresh ? { animationDuration: "2s" } : void 0
-              }
-            )
-          }
-        )
+        ] })
       ] }),
       savedItems.length > 0 && /* @__PURE__ */ u3("div", { class: "mt-3", children: [
         /* @__PURE__ */ u3("div", { class: "mb-1 text-xs font-medium text-slate-500 dark:text-slate-400", children: [
@@ -1247,7 +1247,8 @@
               class: "min-w-0 flex-1 cursor-pointer rounded-md bg-amber-50 px-3 py-2 text-left text-xs text-slate-700 hover:bg-amber-100 disabled:opacity-50 dark:bg-amber-950 dark:text-slate-200 dark:hover:bg-amber-900",
               title: component,
               onClick: () => {
-                handleStop();
+                setConfirmUninstall(false);
+                setConfirmClear(false);
                 launchItem(component);
               },
               disabled: busy,
