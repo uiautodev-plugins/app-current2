@@ -11,6 +11,7 @@ import {
   Package,
   Component,
   Tag,
+  Star,
 } from 'lucide-preact';
 
 async function shell(cmd: string): Promise<string> {
@@ -156,6 +157,47 @@ function CopyButton({
   );
 }
 
+function SaveButton({
+  saved,
+  onToggle,
+  filled,
+}: {
+  saved: boolean;
+  onToggle: () => void;
+  filled?: boolean;
+}) {
+  const showFilled = filled ?? saved;
+  return (
+    <button
+      aria-label={saved ? '取消保存' : '保存'}
+      class="inline-flex shrink-0 cursor-pointer items-center rounded p-1 text-slate-400 hover:bg-slate-200 hover:text-slate-600 dark:hover:bg-slate-700 dark:hover:text-slate-300"
+      onClick={(e) => {
+        e.stopPropagation();
+        onToggle();
+      }}
+    >
+      {showFilled ? (
+        <Star class="h-3.5 w-3.5 fill-amber-400 text-amber-400" />
+      ) : (
+        <Star class="h-3.5 w-3.5" />
+      )}
+    </button>
+  );
+}
+
+const SAVED_KEY = 'current-app.savedActivities';
+
+function loadSaved(): string[] {
+  try {
+    const raw = localStorage.getItem(SAVED_KEY);
+    if (!raw) return [];
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) ? parsed.filter((x) => typeof x === 'string') : [];
+  } catch {
+    return [];
+  }
+}
+
 function App() {
   const [pkg, setPkg] = useState('');
   const [activity, setActivity] = useState('');
@@ -167,8 +209,23 @@ function App() {
   const [launchItems, setLaunchItems] = useState<string[]>([]);
   const [autoRefresh, setAutoRefresh] = useState(true);
   const [copied, setCopied] = useState('');
+  const [savedItems, setSavedItems] = useState<string[]>(loadSaved);
   const pollingRef = useRef(false);
   const lastPkgRef = useRef('');
+
+  useEffect(() => {
+    try {
+      localStorage.setItem(SAVED_KEY, JSON.stringify(savedItems));
+    } catch {
+      // ignore storage failures
+    }
+  }, [savedItems]);
+
+  const toggleSave = useCallback((component: string) => {
+    setSavedItems((prev) =>
+      prev.includes(component) ? prev.filter((c) => c !== component) : [...prev, component],
+    );
+  }, []);
 
   const loadAppInfo = useCallback(async (p: string) => {
     const [items, ver] = await Promise.all([listLauncherActivities(p), getAppVersion(p)]);
@@ -373,6 +430,11 @@ function App() {
                   >
                     <span class="break-all">{component.slice(component.indexOf('/') + 1)}</span>
                   </button>
+                  <SaveButton
+                    filled={false}
+                    saved={savedItems.includes(component)}
+                    onToggle={() => toggleSave(component)}
+                  />
                   <CopyButton text={component} copied={copied === component} onCopy={copyText} />
                 </div>
               </li>
@@ -454,6 +516,36 @@ function App() {
           />
         </button>
       </div>
+
+      {savedItems.length > 0 && (
+        <div class="mt-3">
+          <div class="mb-1 text-xs font-medium text-slate-500 dark:text-slate-400">
+            已保存
+            <span class="ml-1 font-normal text-slate-400 dark:text-slate-500">点击即可启动</span>
+          </div>
+          <ul class="space-y-1">
+            {savedItems.map((component) => (
+              <li key={component}>
+                <div class="flex items-center gap-1">
+                  <button
+                    class="min-w-0 flex-1 cursor-pointer rounded-md bg-amber-50 px-3 py-2 text-left text-xs text-slate-700 hover:bg-amber-100 disabled:opacity-50 dark:bg-amber-950 dark:text-slate-200 dark:hover:bg-amber-900"
+                    title={component}
+                    onClick={() => {
+                      handleStop();
+                      launchItem(component);
+                    }}
+                    disabled={busy}
+                  >
+                    <span class="block truncate">{component}</span>
+                  </button>
+                  <SaveButton saved onToggle={() => toggleSave(component)} />
+                  <CopyButton text={component} copied={copied === component} onCopy={copyText} />
+                </div>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
 
       {status && (
         <div class="mt-3 break-all rounded-md bg-slate-100 p-2 text-xs text-slate-600 dark:bg-slate-800 dark:text-slate-300">

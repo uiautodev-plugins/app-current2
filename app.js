@@ -615,18 +615,18 @@
 
   // node_modules/lucide-preact/dist/esm/createLucideIcon.mjs
   function createLucideIcon(iconDataOrName, iconNode, aliases = []) {
-    const iconData10 = typeof iconDataOrName === "string" ? toLucideIconData(iconDataOrName, iconNode, aliases) : iconDataOrName;
+    const iconData11 = typeof iconDataOrName === "string" ? toLucideIconData(iconDataOrName, iconNode, aliases) : iconDataOrName;
     const Component2 = ({ class: classes = "", className = "", children, ...props }) => k(
       Icon,
       {
         ...props,
-        icon: iconData10,
+        icon: iconData11,
         class: mergeClasses(classes, className)
       },
       children
     );
-    if (iconData10.name) {
-      Component2.displayName = toPascalCase(iconData10.name);
+    if (iconData11.name) {
+      Component2.displayName = toPascalCase(iconData11.name);
     }
     return Component2;
   }
@@ -744,8 +744,24 @@
   };
   var Square = createLucideIcon(iconData7);
 
-  // node_modules/lucide-preact/dist/esm/icons/tag.mjs
+  // node_modules/lucide-preact/dist/esm/icons/star.mjs
   var iconData8 = {
+    name: "star",
+    size: 24,
+    node: [
+      [
+        "path",
+        {
+          d: "M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z",
+          key: "r04s7s"
+        }
+      ]
+    ]
+  };
+  var Star = createLucideIcon(iconData8);
+
+  // node_modules/lucide-preact/dist/esm/icons/tag.mjs
+  var iconData9 = {
     name: "tag",
     size: 24,
     node: [
@@ -759,10 +775,10 @@
       ["circle", { cx: "7.5", cy: "7.5", r: ".5", fill: "currentColor", key: "kqv944" }]
     ]
   };
-  var Tag = createLucideIcon(iconData8);
+  var Tag = createLucideIcon(iconData9);
 
   // node_modules/lucide-preact/dist/esm/icons/trash.mjs
-  var iconData9 = {
+  var iconData10 = {
     name: "trash",
     size: 24,
     node: [
@@ -774,7 +790,7 @@
     ],
     aliases: ["trash-2"]
   };
-  var Trash = createLucideIcon(iconData9);
+  var Trash = createLucideIcon(iconData10);
 
   // node_modules/preact/jsx-runtime/dist/jsxRuntime.module.js
   var f3 = 0;
@@ -884,6 +900,36 @@
       }
     );
   }
+  function SaveButton({
+    saved,
+    onToggle,
+    filled
+  }) {
+    const showFilled = filled ?? saved;
+    return /* @__PURE__ */ u3(
+      "button",
+      {
+        "aria-label": saved ? "\u53D6\u6D88\u4FDD\u5B58" : "\u4FDD\u5B58",
+        class: "inline-flex shrink-0 cursor-pointer items-center rounded p-1 text-slate-400 hover:bg-slate-200 hover:text-slate-600 dark:hover:bg-slate-700 dark:hover:text-slate-300",
+        onClick: (e3) => {
+          e3.stopPropagation();
+          onToggle();
+        },
+        children: showFilled ? /* @__PURE__ */ u3(Star, { class: "h-3.5 w-3.5 fill-amber-400 text-amber-400" }) : /* @__PURE__ */ u3(Star, { class: "h-3.5 w-3.5" })
+      }
+    );
+  }
+  var SAVED_KEY = "current-app.savedActivities";
+  function loadSaved() {
+    try {
+      const raw = localStorage.getItem(SAVED_KEY);
+      if (!raw) return [];
+      const parsed = JSON.parse(raw);
+      return Array.isArray(parsed) ? parsed.filter((x3) => typeof x3 === "string") : [];
+    } catch {
+      return [];
+    }
+  }
   function App() {
     const [pkg, setPkg] = d2("");
     const [activity, setActivity] = d2("");
@@ -895,8 +941,20 @@
     const [launchItems, setLaunchItems] = d2([]);
     const [autoRefresh, setAutoRefresh] = d2(true);
     const [copied, setCopied] = d2("");
+    const [savedItems, setSavedItems] = d2(loadSaved);
     const pollingRef = A2(false);
     const lastPkgRef = A2("");
+    y2(() => {
+      try {
+        localStorage.setItem(SAVED_KEY, JSON.stringify(savedItems));
+      } catch {
+      }
+    }, [savedItems]);
+    const toggleSave = q2((component) => {
+      setSavedItems(
+        (prev) => prev.includes(component) ? prev.filter((c3) => c3 !== component) : [...prev, component]
+      );
+    }, []);
     const loadAppInfo = q2(async (p3) => {
       const [items, ver] = await Promise.all([listLauncherActivities(p3), getAppVersion(p3)]);
       setLaunchItems(items);
@@ -1082,6 +1140,14 @@
               children: /* @__PURE__ */ u3("span", { class: "break-all", children: component.slice(component.indexOf("/") + 1) })
             }
           ),
+          /* @__PURE__ */ u3(
+            SaveButton,
+            {
+              filled: false,
+              saved: savedItems.includes(component),
+              onToggle: () => toggleSave(component)
+            }
+          ),
           /* @__PURE__ */ u3(CopyButton, { text: component, copied: copied === component, onCopy: copyText })
         ] }) }, component)) })
       ] }),
@@ -1169,6 +1235,29 @@
           }
         )
       ] }),
+      savedItems.length > 0 && /* @__PURE__ */ u3("div", { class: "mt-3", children: [
+        /* @__PURE__ */ u3("div", { class: "mb-1 text-xs font-medium text-slate-500 dark:text-slate-400", children: [
+          "\u5DF2\u4FDD\u5B58",
+          /* @__PURE__ */ u3("span", { class: "ml-1 font-normal text-slate-400 dark:text-slate-500", children: "\u70B9\u51FB\u5373\u53EF\u542F\u52A8" })
+        ] }),
+        /* @__PURE__ */ u3("ul", { class: "space-y-1", children: savedItems.map((component) => /* @__PURE__ */ u3("li", { children: /* @__PURE__ */ u3("div", { class: "flex items-center gap-1", children: [
+          /* @__PURE__ */ u3(
+            "button",
+            {
+              class: "min-w-0 flex-1 cursor-pointer rounded-md bg-amber-50 px-3 py-2 text-left text-xs text-slate-700 hover:bg-amber-100 disabled:opacity-50 dark:bg-amber-950 dark:text-slate-200 dark:hover:bg-amber-900",
+              title: component,
+              onClick: () => {
+                handleStop();
+                launchItem(component);
+              },
+              disabled: busy,
+              children: /* @__PURE__ */ u3("span", { class: "block truncate", children: component })
+            }
+          ),
+          /* @__PURE__ */ u3(SaveButton, { saved: true, onToggle: () => toggleSave(component) }),
+          /* @__PURE__ */ u3(CopyButton, { text: component, copied: copied === component, onCopy: copyText })
+        ] }) }, component)) })
+      ] }),
       status && /* @__PURE__ */ u3("div", { class: "mt-3 break-all rounded-md bg-slate-100 p-2 text-xs text-slate-600 dark:bg-slate-800 dark:text-slate-300", children: status })
     ] });
   }
@@ -1194,6 +1283,7 @@ lucide-preact/dist/esm/icons/eraser.mjs:
 lucide-preact/dist/esm/icons/package.mjs:
 lucide-preact/dist/esm/icons/refresh-cw.mjs:
 lucide-preact/dist/esm/icons/square.mjs:
+lucide-preact/dist/esm/icons/star.mjs:
 lucide-preact/dist/esm/icons/tag.mjs:
 lucide-preact/dist/esm/icons/trash.mjs:
 lucide-preact/dist/esm/lucide-preact.mjs:
