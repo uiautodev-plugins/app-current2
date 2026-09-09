@@ -3,7 +3,7 @@
   "name": "当前应用",
   "version": "1.0.0",
   "description": "获取当前前台应用的包名，支持启动、强制停止与卸载",
-  "homepage": "",
+  "homepage": "https://github.com/uiautodev-plugins/app-current2",
   "main": "index.html",
   "platforms": ["android"]
 }
