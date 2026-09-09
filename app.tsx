@@ -214,10 +214,10 @@ function App() {
       try {
         const { pkg: p, activity: a } = await getCurrentApp();
         if (cancelled) return;
+        setActivity(a);
         if (p === lastPkgRef.current) return;
         lastPkgRef.current = p;
         setPkg(p);
-        setActivity(a);
         if (p) {
           const items = await listLauncherActivities(p);
           const ver = await getAppVersion(p);
