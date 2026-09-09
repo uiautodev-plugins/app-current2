@@ -28,6 +28,8 @@ npm run build
 ├── plugin.json          # 插件元信息（名称、版本、描述）
 ├── app.tsx              # 插件逻辑入口
 ├── app.js               # 编译产物（index.html 加载）
+├── app.css              # Tailwind 编译产物（index.html 加载）
+├── styles.css           # Tailwind 源入口
 ├── index.html           # 插件 UI 入口
 └── plugin-runtime.d.ts  # 平台 API 类型定义
 ```
@@ -35,8 +37,8 @@ npm run build
 ## 开发命令
 
 ```bash
-npm run dev          # 开发模式，监听 app.tsx 变化自动编译
-npm run build        # 编译为 app.js
+npm run dev          # 开发模式，同时监听 app.tsx 与样式变化自动编译
+npm run build        # 编译 Tailwind 为 app.css 并打包 app.tsx 为 app.js
 npm run fetch-types  # 拉取最新类型定义（需 uiauto.dev 运行中）
 ```
 
@@ -45,5 +47,5 @@ npm run fetch-types  # 拉取最新类型定义（需 uiauto.dev 运行中）
 - **Preact** — 轻量 UI 框架
 - **lucide-preact** — 图标
 - **TypeScript** — 类型安全
-- **Tailwind CSS** — 通过 CDN 引入，直接在 class 中使用
+- **Tailwind CSS** — 本地构建期预编译（`darkMode: 'class'`，跟随页面 `<html class="dark">`）
 - **esbuild** — 快速编译打包

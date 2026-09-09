@@ -615,20 +615,20 @@
 
   // node_modules/lucide-preact/dist/esm/createLucideIcon.mjs
   function createLucideIcon(iconDataOrName, iconNode, aliases = []) {
-    const iconData7 = typeof iconDataOrName === "string" ? toLucideIconData(iconDataOrName, iconNode, aliases) : iconDataOrName;
-    const Component = ({ class: classes = "", className = "", children, ...props }) => k(
+    const iconData10 = typeof iconDataOrName === "string" ? toLucideIconData(iconDataOrName, iconNode, aliases) : iconDataOrName;
+    const Component2 = ({ class: classes = "", className = "", children, ...props }) => k(
       Icon,
       {
         ...props,
-        icon: iconData7,
+        icon: iconData10,
         class: mergeClasses(classes, className)
       },
       children
     );
-    if (iconData7.name) {
-      Component.displayName = toPascalCase(iconData7.name);
+    if (iconData10.name) {
+      Component2.displayName = toPascalCase(iconData10.name);
     }
-    return Component;
+    return Component2;
   }
 
   // node_modules/lucide-preact/dist/esm/icons/check.mjs
@@ -639,8 +639,45 @@
   };
   var Check = createLucideIcon(iconData);
 
-  // node_modules/lucide-preact/dist/esm/icons/copy.mjs
+  // node_modules/lucide-preact/dist/esm/icons/component.mjs
   var iconData2 = {
+    name: "component",
+    size: 24,
+    node: [
+      [
+        "path",
+        {
+          d: "M15.536 11.293a1 1 0 0 0 0 1.414l2.376 2.377a1 1 0 0 0 1.414 0l2.377-2.377a1 1 0 0 0 0-1.414l-2.377-2.377a1 1 0 0 0-1.414 0z",
+          key: "1uwlt4"
+        }
+      ],
+      [
+        "path",
+        {
+          d: "M2.297 11.293a1 1 0 0 0 0 1.414l2.377 2.377a1 1 0 0 0 1.414 0l2.377-2.377a1 1 0 0 0 0-1.414L6.088 8.916a1 1 0 0 0-1.414 0z",
+          key: "10291m"
+        }
+      ],
+      [
+        "path",
+        {
+          d: "M8.916 17.912a1 1 0 0 0 0 1.415l2.377 2.376a1 1 0 0 0 1.414 0l2.377-2.376a1 1 0 0 0 0-1.415l-2.377-2.376a1 1 0 0 0-1.414 0z",
+          key: "1tqoq1"
+        }
+      ],
+      [
+        "path",
+        {
+          d: "M8.916 4.674a1 1 0 0 0 0 1.414l2.377 2.376a1 1 0 0 0 1.414 0l2.377-2.376a1 1 0 0 0 0-1.414l-2.377-2.377a1 1 0 0 0-1.414 0z",
+          key: "1x6lto"
+        }
+      ]
+    ]
+  };
+  var Component = createLucideIcon(iconData2);
+
+  // node_modules/lucide-preact/dist/esm/icons/copy.mjs
+  var iconData3 = {
     name: "copy",
     size: 24,
     node: [
@@ -648,10 +685,10 @@
       ["path", { d: "M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2", key: "zix9uf" }]
     ]
   };
-  var Copy = createLucideIcon(iconData2);
+  var Copy = createLucideIcon(iconData3);
 
   // node_modules/lucide-preact/dist/esm/icons/eraser.mjs
-  var iconData3 = {
+  var iconData4 = {
     name: "eraser",
     size: 24,
     node: [
@@ -665,10 +702,29 @@
       ["path", { d: "m5.082 11.09 8.828 8.828", key: "1wx5vj" }]
     ]
   };
-  var Eraser = createLucideIcon(iconData3);
+  var Eraser = createLucideIcon(iconData4);
+
+  // node_modules/lucide-preact/dist/esm/icons/package.mjs
+  var iconData5 = {
+    name: "package",
+    size: 24,
+    node: [
+      [
+        "path",
+        {
+          d: "M11 21.73a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73z",
+          key: "1a0edw"
+        }
+      ],
+      ["path", { d: "M12 22V12", key: "d0xqtd" }],
+      ["polyline", { points: "3.29 7 12 12 20.71 7", key: "ousv84" }],
+      ["path", { d: "m7.5 4.27 9 5.15", key: "1c824w" }]
+    ]
+  };
+  var Package = createLucideIcon(iconData5);
 
   // node_modules/lucide-preact/dist/esm/icons/refresh-cw.mjs
-  var iconData4 = {
+  var iconData6 = {
     name: "refresh-cw",
     size: 24,
     node: [
@@ -678,18 +734,35 @@
       ["path", { d: "M8 16H3v5", key: "1cv678" }]
     ]
   };
-  var RefreshCw = createLucideIcon(iconData4);
+  var RefreshCw = createLucideIcon(iconData6);
 
   // node_modules/lucide-preact/dist/esm/icons/square.mjs
-  var iconData5 = {
+  var iconData7 = {
     name: "square",
     size: 24,
     node: [["rect", { width: "18", height: "18", x: "3", y: "3", rx: "2", key: "afitv7" }]]
   };
-  var Square = createLucideIcon(iconData5);
+  var Square = createLucideIcon(iconData7);
+
+  // node_modules/lucide-preact/dist/esm/icons/tag.mjs
+  var iconData8 = {
+    name: "tag",
+    size: 24,
+    node: [
+      [
+        "path",
+        {
+          d: "M12.586 2.586A2 2 0 0 0 11.172 2H4a2 2 0 0 0-2 2v7.172a2 2 0 0 0 .586 1.414l8.704 8.704a2.426 2.426 0 0 0 3.42 0l6.58-6.58a2.426 2.426 0 0 0 0-3.42z",
+          key: "vktsd0"
+        }
+      ],
+      ["circle", { cx: "7.5", cy: "7.5", r: ".5", fill: "currentColor", key: "kqv944" }]
+    ]
+  };
+  var Tag = createLucideIcon(iconData8);
 
   // node_modules/lucide-preact/dist/esm/icons/trash.mjs
-  var iconData6 = {
+  var iconData9 = {
     name: "trash",
     size: 24,
     node: [
@@ -701,7 +774,7 @@
     ],
     aliases: ["trash-2"]
   };
-  var Trash = createLucideIcon(iconData6);
+  var Trash = createLucideIcon(iconData9);
 
   // node_modules/preact/jsx-runtime/dist/jsxRuntime.module.js
   var f3 = 0;
@@ -719,11 +792,15 @@
     const result = await $u.shell(cmd);
     return result.output.trim();
   }
-  var PKG_RE = /(?:mCurrentFocus|mFocusedApp)=.*?\bu\d+\s+([\w.]+)\//;
-  async function getCurrentPackage() {
+  var FOCUS_RE = /(?:mCurrentFocus|mFocusedApp)=.*?\bu\d+\s+([\w.]+)\/([^\s}]+)/;
+  async function getCurrentApp() {
     const out = await shell('dumpsys window | grep -E "mCurrentFocus|mFocusedApp"');
-    const m3 = out.match(PKG_RE);
-    return m3 ? m3[1] : "";
+    const line = out.split("\n").find((l3) => l3.includes("mCurrentFocus"))?.match(FOCUS_RE);
+    const m3 = line ?? out.match(FOCUS_RE);
+    if (!m3) return { pkg: "", activity: "" };
+    const [, pkg, raw] = m3;
+    const activity = raw.startsWith(".") ? `${pkg}${raw}` : raw;
+    return { pkg, activity };
   }
   async function listLauncherActivities(pkg) {
     const out = await shell(
@@ -740,11 +817,11 @@
   }
   async function doLaunch(component) {
     const r3 = await shell(`am start -n ${component}`);
-    return r3 && r3.toLowerCase().includes("error") ? `\u542F\u52A8\u5931\u8D25: ${r3}` : `\u5DF2\u542F\u52A8 ${component}`;
+    return r3 && r3.toLowerCase().includes("error") ? `\u542F\u52A8\u5931\u8D25: ${r3}` : "";
   }
   async function stopApp(pkg) {
     await shell(`am force-stop ${pkg}`);
-    return `\u5DF2\u5F3A\u5236\u505C\u6B62 ${pkg}`;
+    return "";
   }
   async function uninstallApp(pkg) {
     const out = await shell(`pm uninstall ${pkg}`);
@@ -767,7 +844,7 @@
     return /* @__PURE__ */ u3(
       "button",
       {
-        class: `inline-flex cursor-pointer items-center justify-center gap-1 rounded-md px-3 py-1.5 text-xs font-medium text-white disabled:pointer-events-none disabled:opacity-40 ${danger ? "bg-red-600 hover:bg-red-500" : armed ? "bg-amber-500 hover:bg-amber-400" : "bg-slate-900 hover:bg-slate-700 dark:bg-slate-700 dark:hover:bg-slate-600"}`,
+        class: `inline-flex cursor-pointer items-center justify-center gap-1 rounded-md px-3 py-1.5 text-xs font-medium text-white disabled:pointer-events-none disabled:opacity-40 ${armed ? danger ? "bg-red-700 hover:bg-red-600" : "bg-amber-500 hover:bg-amber-400" : danger ? "bg-red-600 hover:bg-red-500" : "bg-slate-900 hover:bg-slate-700 dark:bg-slate-700 dark:hover:bg-slate-600"}`,
         onClick,
         disabled,
         "aria-label": ariaLabel,
@@ -795,6 +872,7 @@
   }
   function App() {
     const [pkg, setPkg] = d2("");
+    const [activity, setActivity] = d2("");
     const [version, setVersion] = d2(null);
     const [busy, setBusy] = d2(false);
     const [status, setStatus] = d2("");
@@ -810,8 +888,9 @@
       setVersion(ver);
     }, []);
     const pollOnce = q2(async () => {
-      const p3 = await getCurrentPackage();
+      const { pkg: p3, activity: a3 } = await getCurrentApp();
       setPkg(p3);
+      setActivity(a3);
       if (p3) {
         await loadAppInfo(p3);
       } else {
@@ -840,9 +919,10 @@
         if (pollingRef.current) return;
         pollingRef.current = true;
         try {
-          const p3 = await getCurrentPackage();
+          const { pkg: p3, activity: a3 } = await getCurrentApp();
           if (cancelled) return;
           setPkg(p3);
+          setActivity(a3);
           if (p3) {
             const items = await listLauncherActivities(p3);
             const ver = await getAppVersion(p3);
@@ -870,6 +950,11 @@
       const t3 = window.setTimeout(() => setConfirmClear(false), 4e3);
       return () => window.clearTimeout(t3);
     }, [confirmClear]);
+    y2(() => {
+      if (!confirmUninstall) return;
+      const t3 = window.setTimeout(() => setConfirmUninstall(false), 4e3);
+      return () => window.clearTimeout(t3);
+    }, [confirmUninstall]);
     const run = q2(
       async (fn) => {
         if (!pkg) return;
@@ -928,8 +1013,37 @@
     }, []);
     return /* @__PURE__ */ u3("div", { children: [
       /* @__PURE__ */ u3("div", { class: "flex items-center gap-1", children: [
-        /* @__PURE__ */ u3("div", { class: "min-w-0 flex-1 break-all rounded-md bg-slate-50 px-3 py-2 font-mono text-sm text-slate-800 dark:bg-slate-800 dark:text-slate-100", children: pkg || "\u672A\u68C0\u6D4B\u5230\u524D\u53F0\u5E94\u7528" }),
+        /* @__PURE__ */ u3("div", { class: "flex min-w-0 flex-1 items-center gap-1.5 break-all font-mono text-sm text-slate-800 dark:text-slate-100", children: [
+          /* @__PURE__ */ u3(Package, { class: "h-4 w-4 shrink-0 text-slate-400", "aria-hidden": true }),
+          /* @__PURE__ */ u3("span", { children: pkg || "\u672A\u68C0\u6D4B\u5230\u524D\u53F0\u5E94\u7528" })
+        ] }),
         pkg && /* @__PURE__ */ u3(CopyButton, { text: pkg, copied: copied === pkg, onCopy: copyText })
+      ] }),
+      pkg && activity && /* @__PURE__ */ u3("div", { class: "mt-1 flex items-center gap-1", children: [
+        /* @__PURE__ */ u3("div", { class: "flex min-w-0 flex-1 items-center gap-1.5 break-all font-mono text-xs text-slate-600 dark:text-slate-300", children: [
+          /* @__PURE__ */ u3(Component, { class: "h-3.5 w-3.5 shrink-0 text-slate-400", "aria-hidden": true }),
+          /* @__PURE__ */ u3("span", { children: activity })
+        ] }),
+        /* @__PURE__ */ u3(CopyButton, { text: activity, copied: copied === activity, onCopy: copyText })
+      ] }),
+      version && /* @__PURE__ */ u3("div", { class: "mt-1 flex items-center gap-1", children: [
+        /* @__PURE__ */ u3("div", { class: "flex min-w-0 flex-1 items-center gap-1.5 break-all font-mono text-xs text-slate-600 dark:text-slate-300", children: [
+          /* @__PURE__ */ u3(Tag, { class: "h-3.5 w-3.5 shrink-0 text-slate-400", "aria-hidden": true }),
+          /* @__PURE__ */ u3("span", { children: [
+            version.name,
+            " (",
+            version.code,
+            ")"
+          ] })
+        ] }),
+        /* @__PURE__ */ u3(
+          CopyButton,
+          {
+            text: `${version.name} (${version.code})`,
+            copied: copied === `${version.name} (${version.code})`,
+            onCopy: copyText
+          }
+        )
       ] }),
       launchItems.length > 0 && /* @__PURE__ */ u3("div", { class: "mt-3", children: [
         /* @__PURE__ */ u3("div", { class: "mb-1 text-xs font-medium text-slate-500 dark:text-slate-400", children: [
@@ -953,25 +1067,6 @@
           /* @__PURE__ */ u3(CopyButton, { text: component, copied: copied === component, onCopy: copyText })
         ] }) }, component)) })
       ] }),
-      version && /* @__PURE__ */ u3("div", { class: "mt-3", children: [
-        /* @__PURE__ */ u3("div", { class: "mb-1 text-xs font-medium text-slate-500 dark:text-slate-400", children: "\u7248\u672C\u53F7" }),
-        /* @__PURE__ */ u3("div", { class: "flex items-center gap-1", children: [
-          /* @__PURE__ */ u3("div", { class: "min-w-0 flex-1 break-all rounded-md bg-slate-50 px-3 py-2 font-mono text-xs text-slate-700 dark:bg-slate-800 dark:text-slate-200", children: [
-            version.name,
-            " (",
-            version.code,
-            ")"
-          ] }),
-          /* @__PURE__ */ u3(
-            CopyButton,
-            {
-              text: `${version.name} (${version.code})`,
-              copied: copied === `${version.name} (${version.code})`,
-              onCopy: copyText
-            }
-          )
-        ] })
-      ] }),
       /* @__PURE__ */ u3("div", { class: "mt-4 mb-2 flex items-center justify-between", children: [
         /* @__PURE__ */ u3("div", { class: "flex gap-2", children: [
           /* @__PURE__ */ u3(
@@ -991,12 +1086,22 @@
             {
               ariaLabel: "\u5378\u8F7D\u5E94\u7528",
               danger: true,
+              armed: confirmUninstall,
               onClick: () => {
-                handleStop();
-                setConfirmUninstall(true);
+                setConfirmClear(false);
+                setAutoRefresh(false);
+                if (confirmUninstall) {
+                  setConfirmUninstall(false);
+                  run(uninstallApp);
+                } else {
+                  setConfirmUninstall(true);
+                }
               },
               disabled: busy || noPkg,
-              children: /* @__PURE__ */ u3(Trash, { class: "h-4 w-4" })
+              children: [
+                /* @__PURE__ */ u3(Trash, { class: "h-4 w-4" }),
+                confirmUninstall && "\u786E\u8BA4?"
+              ]
             }
           ),
           /* @__PURE__ */ u3(
@@ -1046,28 +1151,6 @@
           }
         )
       ] }),
-      confirmUninstall && /* @__PURE__ */ u3("div", { class: "rounded-md border border-red-200 bg-red-50 p-2 dark:border-red-900 dark:bg-red-950", children: [
-        /* @__PURE__ */ u3("p", { class: "mb-2 text-xs text-red-700 dark:text-red-300", children: [
-          "\u786E\u8BA4\u5378\u8F7D ",
-          /* @__PURE__ */ u3("span", { class: "font-mono font-semibold", children: pkg }),
-          " \u5417\uFF1F"
-        ] }),
-        /* @__PURE__ */ u3("div", { class: "flex gap-2", children: [
-          /* @__PURE__ */ u3(
-            Button,
-            {
-              danger: true,
-              onClick: () => {
-                setAutoRefresh(false);
-                run(uninstallApp);
-              },
-              disabled: busy,
-              children: "\u786E\u8BA4\u5378\u8F7D"
-            }
-          ),
-          /* @__PURE__ */ u3(Button, { onClick: () => setConfirmUninstall(false), disabled: busy, children: "\u53D6\u6D88" })
-        ] })
-      ] }),
       status && /* @__PURE__ */ u3("div", { class: "mt-3 break-all rounded-md bg-slate-100 p-2 text-xs text-slate-600 dark:bg-slate-800 dark:text-slate-300", children: status })
     ] });
   }
@@ -1087,10 +1170,13 @@ lucide-preact/dist/esm/context.mjs:
 lucide-preact/dist/esm/Icon.mjs:
 lucide-preact/dist/esm/createLucideIcon.mjs:
 lucide-preact/dist/esm/icons/check.mjs:
+lucide-preact/dist/esm/icons/component.mjs:
 lucide-preact/dist/esm/icons/copy.mjs:
 lucide-preact/dist/esm/icons/eraser.mjs:
+lucide-preact/dist/esm/icons/package.mjs:
 lucide-preact/dist/esm/icons/refresh-cw.mjs:
 lucide-preact/dist/esm/icons/square.mjs:
+lucide-preact/dist/esm/icons/tag.mjs:
 lucide-preact/dist/esm/icons/trash.mjs:
 lucide-preact/dist/esm/lucide-preact.mjs:
   (**

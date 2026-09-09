@@ -1,19 +1,36 @@
 /// <reference path="./plugin-runtime.d.ts" />
 import { render } from 'preact';
 import { useState, useCallback, useEffect, useRef } from 'preact/hooks';
-import { Trash2, Square, RefreshCw, Copy, Check, Eraser } from 'lucide-preact';
+import {
+  Trash2,
+  Square,
+  RefreshCw,
+  Copy,
+  Check,
+  Eraser,
+  Package,
+  Component,
+  Tag,
+} from 'lucide-preact';
 
 async function shell(cmd: string): Promise<string> {
   const result = await $u.shell(cmd);
   return result.output.trim();
 }
 
-const PKG_RE = /(?:mCurrentFocus|mFocusedApp)=.*?\bu\d+\s+([\w.]+)\//;
+const FOCUS_RE = /(?:mCurrentFocus|mFocusedApp)=.*?\bu\d+\s+([\w.]+)\/([^\s}]+)/;
 
-async function getCurrentPackage(): Promise<string> {
+async function getCurrentApp(): Promise<{ pkg: string; activity: string }> {
   const out = await shell('dumpsys window | grep -E "mCurrentFocus|mFocusedApp"');
-  const m = out.match(PKG_RE);
-  return m ? m[1] : '';
+  const line = out
+    .split('\n')
+    .find((l) => l.includes('mCurrentFocus'))
+    ?.match(FOCUS_RE);
+  const m = line ?? out.match(FOCUS_RE);
+  if (!m) return { pkg: '', activity: '' };
+  const [, pkg, raw] = m;
+  const activity = raw.startsWith('.') ? `${pkg}${raw}` : raw;
+  return { pkg, activity };
 }
 
 async function listLauncherActivities(pkg: string): Promise<string[]> {
@@ -36,12 +53,12 @@ async function getAppVersion(pkg: string): Promise<{ name: string; code: string 
 
 async function doLaunch(component: string): Promise<string> {
   const r = await shell(`am start -n ${component}`);
-  return r && r.toLowerCase().includes('error') ? `启动失败: ${r}` : `已启动 ${component}`;
+  return r && r.toLowerCase().includes('error') ? `启动失败: ${r}` : '';
 }
 
 async function stopApp(pkg: string): Promise<string> {
   await shell(`am force-stop ${pkg}`);
-  return `已强制停止 ${pkg}`;
+  return '';
 }
 
 async function uninstallApp(pkg: string): Promise<string> {
@@ -55,9 +72,7 @@ async function uninstallApp(pkg: string): Promise<string> {
 async function clearDataApp(pkg: string): Promise<string> {
   const out = await shell(`pm clear ${pkg}`);
   const msg = out || '(无输出)';
-  return msg.toLowerCase().includes('success') || msg.includes('Success')
-    ? ''
-    : `清空失败: ${msg}`;
+  return msg.toLowerCase().includes('success') || msg.includes('Success') ? '' : `清空失败: ${msg}`;
 }
 
 function Button({
@@ -78,10 +93,12 @@ function Button({
   return (
     <button
       class={`inline-flex cursor-pointer items-center justify-center gap-1 rounded-md px-3 py-1.5 text-xs font-medium text-white disabled:pointer-events-none disabled:opacity-40 ${
-        danger
-          ? 'bg-red-600 hover:bg-red-500'
-          : armed
-            ? 'bg-amber-500 hover:bg-amber-400'
+        armed
+          ? danger
+            ? 'bg-red-700 hover:bg-red-600'
+            : 'bg-amber-500 hover:bg-amber-400'
+          : danger
+            ? 'bg-red-600 hover:bg-red-500'
             : 'bg-slate-900 hover:bg-slate-700 dark:bg-slate-700 dark:hover:bg-slate-600'
       }`}
       onClick={onClick}
@@ -118,6 +135,7 @@ function CopyButton({
 
 function App() {
   const [pkg, setPkg] = useState('');
+  const [activity, setActivity] = useState('');
   const [version, setVersion] = useState<{ name: string; code: string } | null>(null);
   const [busy, setBusy] = useState(false);
   const [status, setStatus] = useState('');
@@ -135,8 +153,9 @@ function App() {
   }, []);
 
   const pollOnce = useCallback(async (): Promise<string> => {
-    const p = await getCurrentPackage();
+    const { pkg: p, activity: a } = await getCurrentApp();
     setPkg(p);
+    setActivity(a);
     if (p) {
       await loadAppInfo(p);
     } else {
@@ -168,9 +187,10 @@ function App() {
       if (pollingRef.current) return;
       pollingRef.current = true;
       try {
-        const p = await getCurrentPackage();
+        const { pkg: p, activity: a } = await getCurrentApp();
         if (cancelled) return;
         setPkg(p);
+        setActivity(a);
         if (p) {
           const items = await listLauncherActivities(p);
           const ver = await getAppVersion(p);
@@ -201,6 +221,12 @@ function App() {
     const t = window.setTimeout(() => setConfirmClear(false), 4000);
     return () => window.clearTimeout(t);
   }, [confirmClear]);
+
+  useEffect(() => {
+    if (!confirmUninstall) return;
+    const t = window.setTimeout(() => setConfirmUninstall(false), 4000);
+    return () => window.clearTimeout(t);
+  }, [confirmUninstall]);
 
   const run = useCallback(
     async (fn: (p: string) => Promise<string>) => {
@@ -266,11 +292,38 @@ function App() {
   return (
     <div>
       <div class="flex items-center gap-1">
-        <div class="min-w-0 flex-1 break-all rounded-md bg-slate-50 px-3 py-2 font-mono text-sm text-slate-800 dark:bg-slate-800 dark:text-slate-100">
-          {pkg || '未检测到前台应用'}
+        <div class="flex min-w-0 flex-1 items-center gap-1.5 break-all font-mono text-sm text-slate-800 dark:text-slate-100">
+          <Package class="h-4 w-4 shrink-0 text-slate-400" aria-hidden />
+          <span>{pkg || '未检测到前台应用'}</span>
         </div>
         {pkg && <CopyButton text={pkg} copied={copied === pkg} onCopy={copyText} />}
       </div>
+
+      {pkg && activity && (
+        <div class="mt-1 flex items-center gap-1">
+          <div class="flex min-w-0 flex-1 items-center gap-1.5 break-all font-mono text-xs text-slate-600 dark:text-slate-300">
+            <Component class="h-3.5 w-3.5 shrink-0 text-slate-400" aria-hidden />
+            <span>{activity}</span>
+          </div>
+          <CopyButton text={activity} copied={copied === activity} onCopy={copyText} />
+        </div>
+      )}
+
+      {version && (
+        <div class="mt-1 flex items-center gap-1">
+          <div class="flex min-w-0 flex-1 items-center gap-1.5 break-all font-mono text-xs text-slate-600 dark:text-slate-300">
+            <Tag class="h-3.5 w-3.5 shrink-0 text-slate-400" aria-hidden />
+            <span>
+              {version.name} ({version.code})
+            </span>
+          </div>
+          <CopyButton
+            text={`${version.name} (${version.code})`}
+            copied={copied === `${version.name} (${version.code})`}
+            onCopy={copyText}
+          />
+        </div>
+      )}
 
       {launchItems.length > 0 && (
         <div class="mt-3">
@@ -301,22 +354,6 @@ function App() {
         </div>
       )}
 
-      {version && (
-        <div class="mt-3">
-          <div class="mb-1 text-xs font-medium text-slate-500 dark:text-slate-400">版本号</div>
-          <div class="flex items-center gap-1">
-            <div class="min-w-0 flex-1 break-all rounded-md bg-slate-50 px-3 py-2 font-mono text-xs text-slate-700 dark:bg-slate-800 dark:text-slate-200">
-              {version.name} ({version.code})
-            </div>
-            <CopyButton
-              text={`${version.name} (${version.code})`}
-              copied={copied === `${version.name} (${version.code})`}
-              onCopy={copyText}
-            />
-          </div>
-        </div>
-      )}
-
       <div class="mt-4 mb-2 flex items-center justify-between">
         <div class="flex gap-2">
           <Button
@@ -332,13 +369,21 @@ function App() {
           <Button
             ariaLabel="卸载应用"
             danger
+            armed={confirmUninstall}
             onClick={() => {
-              handleStop();
-              setConfirmUninstall(true);
+              setConfirmClear(false);
+              setAutoRefresh(false);
+              if (confirmUninstall) {
+                setConfirmUninstall(false);
+                run(uninstallApp);
+              } else {
+                setConfirmUninstall(true);
+              }
             }}
             disabled={busy || noPkg}
           >
             <Trash2 class="h-4 w-4" />
+            {confirmUninstall && '确认?'}
           </Button>
           <Button
             ariaLabel="清空应用数据"
@@ -382,29 +427,6 @@ function App() {
           />
         </button>
       </div>
-
-      {confirmUninstall && (
-        <div class="rounded-md border border-red-200 bg-red-50 p-2 dark:border-red-900 dark:bg-red-950">
-          <p class="mb-2 text-xs text-red-700 dark:text-red-300">
-            确认卸载 <span class="font-mono font-semibold">{pkg}</span> 吗？
-          </p>
-          <div class="flex gap-2">
-            <Button
-              danger
-              onClick={() => {
-                setAutoRefresh(false);
-                run(uninstallApp);
-              }}
-              disabled={busy}
-            >
-              确认卸载
-            </Button>
-            <Button onClick={() => setConfirmUninstall(false)} disabled={busy}>
-              取消
-            </Button>
-          </div>
-        </div>
-      )}
 
       {status && (
         <div class="mt-3 break-all rounded-md bg-slate-100 p-2 text-xs text-slate-600 dark:bg-slate-800 dark:text-slate-300">
