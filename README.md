@@ -1,55 +1,55 @@
-# 当前应用
+# Current App
 
-一个 [uiauto.dev](https://github.com/nicepkg/uiautodev) 插件：获取当前前台应用的包名，并支持启动、强制停止与卸载。
+A [uiauto.dev](https://github.com/nicepkg/uiautodev) plugin: gets the package name of the current foreground app, with support for launching, force-stopping, and uninstalling it. [中文](./README.zh-CN.md)
 
-## 功能
+## Features
 
-- **自动刷新**：插件打开后自动检测当前前台应用包名，每 3 秒静默轮询，切换应用后自动更新
-- **启动入口列表**：通过 `cmd package query-activities` 解析该应用的全部 MAIN/LAUNCHER 入口（部分应用存在多个），点击即可启动
-- **强制停止**：执行 `am force-stop` 停止当前应用
-- **卸载**：二次确认后执行 `pm uninstall` 卸载当前应用
-- **手动刷新开关**：点击刷新按钮可随时手动刷新；开启/关闭自动刷新
+- **Auto refresh**: Detects the foreground app package name automatically once opened, silently polls every 3 seconds, and updates when the app changes
+- **Launch entry list**: Parses all MAIN/LAUNCHER entries of the app via `cmd package query-activities` (some apps have several); click to launch
+- **Force stop**: Runs `am force-stop` to stop the current app
+- **Uninstall**: Runs `pm uninstall` after a confirmation prompt
+- **Manual refresh toggle**: Refresh button for manual refresh anytime; turn auto refresh on/off
 
-## 截图
+## Screenshot
 
-![截图](screenshot.webp)
+![Screenshot](screenshot.webp)
 
-## 使用
+## Usage
 
-1. 将插件目录放入 `~/.config/uiautodev/plugins/`
-2. 安装依赖并构建：
+1. Put the plugin directory into `~/.config/uiautodev/plugins/`
+2. Install dependencies and build:
 
 ```bash
 npm install
 npm run build
 ```
 
-3. 在 uiauto.dev 中打开插件，保持设备在前台运行一个应用，插件会自动显示其包名。
+3. Open the plugin in uiauto.dev, keep an app in the foreground on the device, and the plugin shows its package name.
 
-## 项目结构
+## Project Structure
 
 ```
-├── plugin.json          # 插件元信息（名称、版本、描述）
-├── app.tsx              # 插件逻辑入口
-├── app.js               # 编译产物（index.html 加载）
-├── app.css              # Tailwind 编译产物（index.html 加载）
-├── styles.css           # Tailwind 源入口
-├── index.html           # 插件 UI 入口
-└── plugin-runtime.d.ts  # 平台 API 类型定义
+├── plugin.json          # Plugin metadata (name, version, description)
+├── app.tsx              # Plugin logic entry
+├── app.js               # Compiled output (loaded by index.html)
+├── app.css              # Tailwind compiled output (loaded by index.html)
+├── styles.css           # Tailwind source entry
+├── index.html           # Plugin UI entry
+└── plugin-runtime.d.ts  # Platform API type definitions
 ```
 
-## 开发命令
+## Development Commands
 
 ```bash
-npm run dev          # 开发模式，同时监听 app.tsx 与样式变化自动编译
-npm run build        # 编译 Tailwind 为 app.css 并打包 app.tsx 为 app.js
-npm run fetch-types  # 拉取最新类型定义（需 uiauto.dev 运行中）
+npm run dev          # Dev mode, watches app.tsx and styles, auto-compiles
+npm run build        # Compile Tailwind into app.css and bundle app.tsx into app.js
+npm run fetch-types  # Fetch the latest type definitions (requires uiauto.dev running)
 ```
 
-## 技术栈
+## Tech Stack
 
-- **Preact** — 轻量 UI 框架
-- **lucide-preact** — 图标
-- **TypeScript** — 类型安全
-- **Tailwind CSS** — 本地构建期预编译（`darkMode: 'class'`，跟随页面 `<html class="dark">`）
-- **esbuild** — 快速编译打包
+- **Preact** — lightweight UI framework
+- **lucide-preact** — icons
+- **TypeScript** — type safety
+- **Tailwind CSS** — build-time precompilation (`darkMode: 'class'`, follows `<html class="dark">`)
+- **esbuild** — fast bundling
